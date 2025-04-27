@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">t_travel</string>
+    <string name="participantsAndBudget">Участники: %1$s, Бюджет: %2$s ₽</string>
 </resources>
