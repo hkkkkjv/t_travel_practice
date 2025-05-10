@@ -16,7 +16,8 @@ data class UserDto(
         return User(
             id = id,
             username = username,
-            name = "$firstName $lastName",
+            firstName = firstName,
+            lastName = lastName,
             phone = phone,
             email = email,
             password = password

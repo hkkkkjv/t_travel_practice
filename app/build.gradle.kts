@@ -68,4 +68,5 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
     implementation(libs.bundles.compose.base)
+    implementation(libs.jetbrains.kotlinx.collections.immutable)
 }

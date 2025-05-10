@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">t_travel</string>
-    <string name="participantsAndBudget">Участники: %1$s, Бюджет: %2$s ₽</string>
+    <string name="participants_budget">Участники: %1$s, Бюджет: %2$s ₽</string>
+    <string name="trips">Поездки</string>
+    <string name="error">Ошибка</string>
+    <string name="refresh">Refresh</string>
+    <string name="retry">Retry</string>
+    <string name="no_trips_available">No trips available</string>
+    <string name="error_loading_trips">Error loading trips</string>
 </resources>

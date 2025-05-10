@@ -1,8 +1,10 @@
 package ru.kpfu.itis.t_travel.data.repository
 
+import ru.kpfu.itis.t_travel.data.model.AuthResponse
 import ru.kpfu.itis.t_travel.data.remote.ApiService
 import ru.kpfu.itis.t_travel.domain.model.AuthResult
 import ru.kpfu.itis.t_travel.domain.model.LoginCredentials
+import ru.kpfu.itis.t_travel.domain.model.User
 import ru.kpfu.itis.t_travel.domain.repository.AuthRepository
 import ru.kpfu.itis.t_travel.presentation.common.TokenManager
 import javax.inject.Inject
@@ -29,5 +31,9 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             AuthResult.Error(e.message ?: "Network error")
         }
+    }
+
+    override suspend fun register(user: User): AuthResponse {
+        TODO("Not yet implemented")
     }
 }

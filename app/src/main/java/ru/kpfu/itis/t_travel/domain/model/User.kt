@@ -3,7 +3,8 @@ package ru.kpfu.itis.t_travel.domain.model
 data class User(
     val id: Int,
     val username: String,
-    val name: String,
+    val firstName: String,
+    val lastName: String,
     val phone: String,
     val email: String,
     val password: String
@@ -12,7 +13,8 @@ data class User(
         fun mock() = User(
             id = 1,
             username = "ivanivanov",
-            name = "Иван Иванов",
+            firstName = "Иван",
+            lastName = "Иванов",
             phone = "+79990001122",
             email = "ivan@ivan.ru",
             password = "ivanivan"

@@ -16,13 +16,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
     @Provides
-    @Singleton
     fun provideTripRepository(apiService: ApiService): TripRepository {
         return TripRepositoryImpl(apiService)
     }
 
     @Provides
-    @Singleton
     fun provideAuthRepository(
         apiService: ApiService,
         tokenManager: TokenManager

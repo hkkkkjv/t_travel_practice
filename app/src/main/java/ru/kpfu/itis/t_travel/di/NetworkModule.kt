@@ -1,6 +1,5 @@
 package ru.kpfu.itis.t_travel.di
 
-import android.content.ContentProviderClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -8,13 +7,12 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import ru.kpfu.itis.t_travel.data.remote.ApiService
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
@@ -31,7 +29,6 @@ object AppModule {
         return Retrofit.Builder()
             .baseUrl("https://myapp.com")
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 

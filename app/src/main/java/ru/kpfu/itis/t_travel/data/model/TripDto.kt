@@ -7,8 +7,8 @@ import java.time.LocalDate
 data class TripDto(
     @SerializedName("id") val id: Int,
     @SerializedName("title") val title: String,
-    @SerializedName("startDate") val startDate: String,
-    @SerializedName("endDate") val endDate: String,
+    @SerializedName("startDate") val startDate: LocalDate,
+    @SerializedName("endDate") val endDate: LocalDate,
     @SerializedName("participants") val participants: List<UserDto>,
     @SerializedName("budget") val budget: Double,
     @SerializedName("expenses") val expenses: List<ExpenseDto>
@@ -17,8 +17,8 @@ data class TripDto(
         return Trip(
             id = id,
             title = title,
-            startDate = LocalDate.parse(startDate),
-            endDate = LocalDate.parse(endDate),
+            startDate = startDate,
+            endDate = endDate,
             participants = participants.map { it.toDomain() },
             budget = budget,
             expenses = expenses.map { it.toDomain() }
