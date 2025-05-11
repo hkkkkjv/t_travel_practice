@@ -9,6 +9,9 @@ data class TripDto(
     @SerializedName("title") val title: String,
     @SerializedName("startDate") val startDate: LocalDate,
     @SerializedName("endDate") val endDate: LocalDate,
+    @SerializedName("departureCity") val departureCity: String,
+    @SerializedName("destinationCity") val destinationCity: String,
+    @SerializedName("createdBy") val createdBy: Long,
     @SerializedName("participants") val participants: List<UserDto>,
     @SerializedName("budget") val budget: Double,
     @SerializedName("expenses") val expenses: List<ExpenseDto>
@@ -21,7 +24,10 @@ data class TripDto(
             endDate = endDate,
             participants = participants.map { it.toDomain() },
             budget = budget,
-            expenses = expenses.map { it.toDomain() }
+            expenses = expenses.map { it.toDomain() },
+            departureCity = TODO(),
+            destinationCity = TODO(),
+            createdBy = TODO()
         )
     }
 }

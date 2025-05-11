@@ -1,6 +1,7 @@
 package ru.kpfu.itis.t_travel.presentation.screens.trips.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -180,7 +181,7 @@ private fun InternalTripScreen(
 @Preview
 @Composable
 private fun TripScreenPreview() {
-    androidx.compose.material3.MaterialTheme {
+    MaterialTheme {
         InternalTripScreen(
             state = TripState(
                 trips = persistentListOf(
@@ -191,12 +192,23 @@ private fun TripScreenPreview() {
                         endDate = LocalDate.now().plusDays(7),
                         participants = listOf(User.mock()),
                         budget = 100000.0,
-                        expenses = listOf(Expense.mock())
+                        expenses = listOf(Expense.mock()),
+                        departureCity = "Казань",
+                        destinationCity = "Сочи",
+                        createdBy = 1
                     )
                 )
             ),
             onRefresh = {},
             onTripClick = {}
         )
+    }
+}
+
+@Preview(widthDp = 50, heightDp = 50)
+@Composable
+fun SquareComposablePreview() {
+    Box(Modifier.background(Color.Yellow)) {
+        Text("Hello World")
     }
 }

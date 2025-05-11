@@ -30,14 +30,17 @@ class TripRepositoryImpl @Inject constructor(
             startDate = LocalDate.now().plusDays(10),
             endDate = LocalDate.now().plusDays(17),
             participants = listOf(
-                User(1, "user1", "Иван","Иванов", "+79991112233", "ivan@mail.com", ""),
+                User(1, "user1", "Иван", "Иванов", "+79991112233", "ivan@mail.com", ""),
                 User(2, "user2", "Мария", "Петрова", "+79992223344", "maria@mail.com", "")
             ),
             budget = 100000.0,
             expenses = listOf(
                 Expense(1, "Билеты на поезд", 15000.0, 1, listOf(1, 2)),
                 Expense(2, "Отель", 40000.0, 2, listOf(1, 2))
-            )
+            ),
+            departureCity = "Казань",
+            destinationCity = "Сочи",
+            createdBy = 1
         )
     )
 }

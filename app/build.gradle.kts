@@ -63,10 +63,13 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    debugImplementation(libs.androidx.ui.tooling)
     ksp(libs.hilt.compiler)
     implementation(platform(libs.okhttp.bom))
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
     implementation(libs.bundles.compose.base)
     implementation(libs.jetbrains.kotlinx.collections.immutable)
+    implementation (libs.accompanist.systemuicontroller)
+
 }

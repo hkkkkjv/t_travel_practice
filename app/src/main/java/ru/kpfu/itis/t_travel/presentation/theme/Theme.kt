@@ -1,5 +1,6 @@
 package ru.kpfu.itis.t_travel.presentation.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Typography
@@ -19,6 +20,8 @@ private val LightColorScheme = lightColorScheme(
     onBackground = OnBackground,
     onSurface = OnSurface,
     onError = OnError,
+    surfaceVariant = Gray,
+    onSurfaceVariant = OnGray
 )
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryColor,
@@ -35,11 +38,17 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun TravelTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     MaterialTheme(
-        colorScheme = LightColorScheme,
+        colorScheme = colorScheme,
         typography = Typography(),
-        content = content
-    )
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            content = content
+        )
+    }
 }

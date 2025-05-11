@@ -1,6 +1,5 @@
 package ru.kpfu.itis.t_travel.data.repository
 
-import ru.kpfu.itis.t_travel.data.model.AuthResponse
 import ru.kpfu.itis.t_travel.data.remote.ApiService
 import ru.kpfu.itis.t_travel.domain.model.AuthResult
 import ru.kpfu.itis.t_travel.domain.model.LoginCredentials
@@ -33,7 +32,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun register(user: User): AuthResponse {
+    override suspend fun register(user: User): AuthResult {
         TODO("Not yet implemented")
     }
 }
