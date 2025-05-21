@@ -10,5 +10,4 @@ data class RegisterState(
     val confirmPassword: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isRegistered: Boolean = false
 )

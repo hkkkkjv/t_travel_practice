@@ -3,6 +3,7 @@ package ru.kpfu.itis.t_travel.presentation.screens.auth.register
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,13 +14,16 @@ import kotlinx.coroutines.launch
 import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.domain.exception.AppException
 import ru.kpfu.itis.t_travel.domain.useCase.auth.RegisterUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.auth.RegistrationException
+import ru.kpfu.itis.t_travel.presentation.common.BaseViewModel
+import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     @ApplicationContext private val context: Context
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _state = MutableStateFlow(RegisterState())
     val state: StateFlow<RegisterState> = _state.asStateFlow()
@@ -34,6 +38,11 @@ class RegisterViewModel @Inject constructor(
             is RegisterEvent.PasswordChanged -> _state.update { it.copy(password = event.value) }
             is RegisterEvent.ConfirmPasswordChanged -> _state.update { it.copy(confirmPassword = event.value) }
             is RegisterEvent.RegisterClicked -> register()
+            is RegisterEvent.NavigateBack->{
+                viewModelScope.launch {
+                    navigate(NavigationAction.NavigateBack)
+                }
+            }
         }
     }
 
@@ -43,6 +52,7 @@ class RegisterViewModel @Inject constructor(
             try {
                 if (_state.value.password != _state.value.confirmPassword) {
                     _state.update { it.copy(error = context.getString(R.string.passwords_do_not_match)) }
+                    return@launch
                 }
                 registerUseCase(
                     username = _state.value.username,
@@ -52,7 +62,7 @@ class RegisterViewModel @Inject constructor(
                     lastName = _state.value.lastName,
                     password = _state.value.password
                 )
-                _state.update { it.copy(isRegistered = true) }
+                navigate(NavigationAction.NavigateToLogin)
             } catch (e: Exception) {
                 _state.update { it.copy(error = getMessage(e)) }
             } finally {
@@ -62,13 +72,13 @@ class RegisterViewModel @Inject constructor(
     }
 
     private fun getMessage(e: Throwable): String = when (e) {
-        is AppException.RegistrationException.EmptyUsernameException -> context.getString(R.string.blank_login_error)
-        is AppException.RegistrationException.EmptyEmailException -> context.getString(R.string.email_blank_error)
-        is AppException.RegistrationException.EmptyPhoneException -> context.getString(R.string.phone_blank_error)
-        is AppException.RegistrationException.EmptyFirstNameException -> context.getString(R.string.name_blank_error)
-        is AppException.RegistrationException.EmptyLastNameException -> context.getString(R.string.lastname_blank_error)
-        is AppException.RegistrationException.EmptyPasswordException -> context.getString(R.string.password_blank_error)
-        is AppException.RegistrationException.ShortPasswordException -> context.getString(R.string.password_too_short_error)
+        is RegistrationException.EmptyUsernameException -> context.getString(R.string.blank_login_error)
+        is RegistrationException.EmptyEmailException -> context.getString(R.string.email_blank_error)
+        is RegistrationException.EmptyPhoneException -> context.getString(R.string.phone_blank_error)
+        is RegistrationException.EmptyFirstNameException -> context.getString(R.string.name_blank_error)
+        is RegistrationException.EmptyLastNameException -> context.getString(R.string.lastname_blank_error)
+        is RegistrationException.EmptyPasswordException -> context.getString(R.string.password_blank_error)
+        is RegistrationException.ShortPasswordException -> context.getString(R.string.password_too_short_error)
         else -> context.getString(R.string.registration_error)
     }
 }

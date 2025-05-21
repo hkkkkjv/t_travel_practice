@@ -1,4 +1,4 @@
-package ru.kpfu.itis.domain.exception
+package ru.kpfu.itis.t_travel.domain.exception
 
 import retrofit2.HttpException
 import ru.kpfu.itis.t_travel.domain.exception.AppException

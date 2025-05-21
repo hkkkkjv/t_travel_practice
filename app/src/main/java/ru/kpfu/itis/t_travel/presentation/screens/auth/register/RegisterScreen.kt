@@ -22,25 +22,18 @@ import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.presentation.common.ui.AuthTextField
 import ru.kpfu.itis.t_travel.presentation.common.ui.PrimaryButton
 import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBar
+import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel(),
-    onBackClick: () -> Unit,
-    onRegisterSuccess: () -> Unit
+    onNavigationAction: (NavigationAction) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-
-    LaunchedEffect(state.isRegistered) {
-        if (state.isRegistered) {
-            onRegisterSuccess()
-        }
-    }
 
     InternalRegisterScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        onBackClick = onBackClick
     )
 }
 
@@ -48,13 +41,12 @@ fun RegisterScreen(
 fun InternalRegisterScreen(
     state: RegisterState,
     onEvent: (RegisterEvent) -> Unit,
-    onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TransparentTopAppBar(
                 title = stringResource(R.string.registration),
-                onBackClick = onBackClick,
+                onBackClick = { onEvent(RegisterEvent.NavigateBack) },
             )
         }) { paddingValues ->
         Column(
@@ -123,10 +115,8 @@ private fun RegisterScreenPreview() {
                 password = "",
                 isLoading = false,
                 error = null,
-                isRegistered = false
             ),
             onEvent = {},
-            onBackClick = {}
         )
     }
 }
@@ -144,10 +134,8 @@ private fun RegisterScreenLoadingPreview() {
                 password = "password123",
                 isLoading = true,
                 error = null,
-                isRegistered = false
             ),
             onEvent = {},
-            onBackClick = {}
         )
     }
 }
@@ -165,10 +153,8 @@ private fun RegisterScreenErrorPreview() {
                 password = "password123",
                 isLoading = false,
                 error = "Пользователь с таким телефоном уже существует",
-                isRegistered = false
             ),
             onEvent = {},
-            onBackClick = {}
         )
     }
 }

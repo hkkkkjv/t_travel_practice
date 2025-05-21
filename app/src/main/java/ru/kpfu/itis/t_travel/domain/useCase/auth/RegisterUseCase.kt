@@ -1,6 +1,5 @@
 package ru.kpfu.itis.t_travel.domain.useCase.auth
 
-import ru.kpfu.itis.t_travel.domain.exception.AppException
 import ru.kpfu.itis.t_travel.domain.model.AuthResult
 import ru.kpfu.itis.t_travel.domain.model.User
 import ru.kpfu.itis.t_travel.domain.repository.AuthRepository
@@ -17,13 +16,13 @@ class RegisterUseCase @Inject constructor(
         lastName: String,
         password: String
     ): AuthResult {
-        if (username.isBlank()) throw AppException.RegistrationException.EmptyUsernameException("")
-        if (email.isBlank()) throw AppException.RegistrationException.EmptyEmailException("")
-        if (phone.isBlank()) throw AppException.RegistrationException.EmptyPhoneException("")
-        if (firstName.isBlank()) throw AppException.RegistrationException.EmptyFirstNameException("")
-        if (lastName.isBlank()) throw AppException.RegistrationException.EmptyLastNameException("")
-        if (password.isBlank()) throw AppException.RegistrationException.EmptyPasswordException("")
-        if (password.length < 6) throw AppException.RegistrationException.ShortPasswordException("")
+        if (username.isBlank()) throw RegistrationException.EmptyUsernameException("")
+        if (email.isBlank()) throw RegistrationException.EmptyEmailException("")
+        if (phone.isBlank()) throw RegistrationException.EmptyPhoneException("")
+        if (firstName.isBlank()) throw RegistrationException.EmptyFirstNameException("")
+        if (lastName.isBlank()) throw RegistrationException.EmptyLastNameException("")
+        if (password.isBlank()) throw RegistrationException.EmptyPasswordException("")
+        if (password.length < 6) throw RegistrationException.ShortPasswordException("")
 
         return authRepository.register(
             User(

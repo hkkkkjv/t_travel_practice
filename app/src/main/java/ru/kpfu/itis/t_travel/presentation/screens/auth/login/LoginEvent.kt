@@ -4,4 +4,6 @@ sealed class LoginEvent {
     data class PhoneChanged(val value: String) : LoginEvent()
     data class PasswordChanged(val value: String) : LoginEvent()
     object LoginClicked : LoginEvent()
+    object RegisterClicked : LoginEvent()
+    object BackClicked : LoginEvent()
 }

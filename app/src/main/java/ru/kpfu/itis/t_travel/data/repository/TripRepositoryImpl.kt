@@ -13,7 +13,7 @@ import javax.inject.Inject
 class TripRepositoryImpl @Inject constructor(
     private val apiService: ApiService
 ) : TripRepository {
-    override suspend fun getTrips(): ImmutableList<Trip> {
+    override suspend fun getTrips(): List<Trip> {
         return try {
             mockTrips
         } catch (e: Exception) {
@@ -23,7 +23,7 @@ class TripRepositoryImpl @Inject constructor(
     }
 
 
-    private val mockTrips = persistentListOf(
+    private val mockTrips = listOf(
         Trip(
             id = 1,
             title = "Отпуск в Сочи",

@@ -37,13 +37,12 @@ import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.presentation.common.ui.AuthTextField
 import ru.kpfu.itis.t_travel.presentation.common.ui.PrimaryButton
 import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBar
+import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    onRegisterClick: () -> Unit,
-    onLoginSuccess: () -> Unit,
-    onBackClick: () -> Unit
+    onNavigationAction: (NavigationAction) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val systemUiController = rememberSystemUiController()
@@ -51,33 +50,28 @@ fun LoginScreen(
         color = Color.White,
         darkIcons = true
     )
-    LaunchedEffect(state.isLoggedIn) {
-        if (state.isLoggedIn) {
-            onLoginSuccess()
+    LaunchedEffect(Unit) {
+        viewModel.navigationAction.collect { action ->
+            onNavigationAction(action)
         }
     }
 
     InternalLoginScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        onRegisterClick = onRegisterClick,
-        onBackClick = onBackClick
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InternalLoginScreen(
     state: LoginState,
     onEvent: (LoginEvent) -> Unit,
-    onRegisterClick: () -> Unit,
-    onBackClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TransparentTopAppBar(
                 title = stringResource(R.string.login),
-                onBackClick = onBackClick,
+                onBackClick = { onEvent(LoginEvent.BackClicked) },
             )
         }) { paddingValues ->
         Column(
@@ -110,7 +104,7 @@ private fun InternalLoginScreen(
                 )
                 Spacer(Modifier.width(12.dp))
                 TextButton(
-                    onClick = onRegisterClick
+                    onClick = { onEvent(LoginEvent.RegisterClicked) }
                 ) {
                     Text(
                         stringResource(R.string.registration),
@@ -142,8 +136,6 @@ private fun LoginScreenPreview() {
                 isLoggedIn = false
             ),
             onEvent = {},
-            onRegisterClick = {},
-            onBackClick = {}
         )
     }
 }
@@ -161,8 +153,6 @@ private fun LoginScreenLoadingPreview() {
                 isLoggedIn = false
             ),
             onEvent = {},
-            onRegisterClick = {},
-            onBackClick = {}
         )
     }
 }
@@ -180,8 +170,6 @@ private fun LoginScreenErrorPreview() {
                 isLoggedIn = false
             ),
             onEvent = {},
-            onRegisterClick = {},
-            onBackClick = {}
         )
     }
 }

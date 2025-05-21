@@ -16,7 +16,7 @@ sealed class Screen(val route: String) {
     object TripCreate : Screen("trip_create")
     object Budget : Screen("budget")
     object ExpenseCategories : Screen("expense_categories")
-    object BudgetDistribution : Screen("budget_distribution")
+    object BudgetDistribution : Screen("budget_distribution/{tripId}")
     object TripDetails : Screen("trip_details/{tripId}")
     object ExpensesTab : Screen("expenses_tab/{tripId}")
     object Profile : Screen("profile")
@@ -31,39 +31,65 @@ fun AppNavigation(
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Welcome.route) {
             WelcomeScreen(
-                onLoginClick = { navController.navigate(Screen.Login.route) }
+                navigateLoginScreen = {
+                    handleNavigationAction(NavigationAction.NavigateToLogin, navController)
+                }
             )
         }
         composable(Screen.Login.route) {
             LoginScreen(
-                onLoginSuccess = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
-                onRegisterClick = {
-                    navController.navigate(Screen.Register.route)
-                },
-                onBackClick = {
-                    navController.popBackStack()
+                onNavigationAction = { action ->
+                    handleNavigationAction(action, navController)
                 }
             )
         }
 
         composable(Screen.Register.route) {
             RegisterScreen(
-                onRegisterSuccess = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
-                },
-                onBackClick = {
-                    navController.popBackStack()
+                onNavigationAction = { action ->
+                    handleNavigationAction(action, navController)
                 }
             )
         }
-
     }
 }
-
+private fun handleNavigationAction(action: NavigationAction, navController: NavHostController){
+    when (action) {
+        is NavigationAction.NavigateToHome -> {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+        is NavigationAction.NavigateToLogin -> {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+        is NavigationAction.NavigateToRegister -> {
+            navController.navigate(Screen.Register.route)
+        }
+        is NavigationAction.NavigateToTripCreate -> {
+            navController.navigate(Screen.TripCreate.route)
+        }
+        is NavigationAction.NavigateToTripDetails -> {
+            navController.navigate(Screen.TripDetails.route.replace("{tripId}",action.tripId))
+        }
+        is NavigationAction.NavigateBack -> {
+            navController.popBackStack()
+        }
+        is NavigationAction.NavigateToProfile -> {
+            navController.navigate(Screen.Profile.route)
+        }
+        is NavigationAction.NavigateToSettings -> {
+            navController.navigate(Screen.Settings.route)
+        }
+        is NavigationAction.NavigateToExpensesTab -> {
+            navController.navigate(Screen.ExpensesTab.route.replace("{tripId}", action.tripId))
+        }
+        is NavigationAction.NavigateToBudgetDistribution -> {
+            navController.navigate(Screen.BudgetDistribution.route.replace("{tripId}", action.tripId))
+        }
+        else -> {}
+    }
+}
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -44,7 +45,7 @@ open class TripViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             try {
                 val trips = repository.getTrips()
-                _state.update { it.copy(trips = trips, isLoading = false) }
+                _state.update { it.copy(trips = trips.toImmutableList(), isLoading = false) }
             }catch (e: CancellationException) {
                 throw e
             }  catch (e: Exception) {

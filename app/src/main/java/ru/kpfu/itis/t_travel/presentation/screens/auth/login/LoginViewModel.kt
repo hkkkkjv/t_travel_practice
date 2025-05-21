@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.t_travel.domain.model.LoginCredentials
 import ru.kpfu.itis.t_travel.domain.useCase.auth.LoginUseCase
+import ru.kpfu.itis.t_travel.presentation.common.BaseViewModel
+import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase
-) : ViewModel() {
+) : BaseViewModel() {
     private val _loginState = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _loginState.asStateFlow()
 
@@ -31,6 +33,16 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.LoginClicked -> {
                 login(LoginCredentials(_loginState.value.phone, _loginState.value.password))
             }
+            is LoginEvent.RegisterClicked -> {
+                viewModelScope.launch {
+                    navigate(NavigationAction.NavigateToRegister)
+                }
+            }
+            is LoginEvent.BackClicked -> {
+                viewModelScope.launch {
+                    navigate(NavigationAction.NavigateBack)
+                }
+            }
         }
     }
     private fun login(credentials: LoginCredentials) {
@@ -38,6 +50,7 @@ class LoginViewModel @Inject constructor(
             _loginState.update { it.copy(isLoading = true, error = null) }
             try {
                 loginUseCase(_loginState.value.phone, _loginState.value.password)
+                navigate(NavigationAction.NavigateToHome)
             } catch (e: Exception) {
                 _loginState.update { it.copy(error = e.message ?: "Ошибка входа") }
             } finally {
