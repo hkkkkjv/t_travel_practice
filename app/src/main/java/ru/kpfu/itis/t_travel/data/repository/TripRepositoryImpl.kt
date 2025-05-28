@@ -1,46 +1,98 @@
 package ru.kpfu.itis.t_travel.data.repository
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import ru.kpfu.itis.t_travel.domain.model.Trip
-import ru.kpfu.itis.t_travel.domain.model.User
+import retrofit2.HttpException
+import ru.kpfu.itis.t_travel.data.model.BudgetCategoryDto
+import ru.kpfu.itis.t_travel.data.model.BudgetDto
 import ru.kpfu.itis.t_travel.data.remote.ApiService
-import ru.kpfu.itis.t_travel.domain.model.Expense
+import ru.kpfu.itis.t_travel.domain.model.BudgetCategory
+import ru.kpfu.itis.t_travel.domain.model.Trip
 import ru.kpfu.itis.t_travel.domain.repository.TripRepository
-import java.time.LocalDate
 import javax.inject.Inject
 
 class TripRepositoryImpl @Inject constructor(
     private val apiService: ApiService
 ) : TripRepository {
-    override suspend fun getTrips(): List<Trip> {
+    override suspend fun getTrips(): Result<List<Trip>> {
         return try {
-            mockTrips
+            val tripsResponse = apiService.getTrips()
+            if (tripsResponse.isSuccessful) {
+                val trips = tripsResponse.body()
+                    ?: return Result.failure(NullPointerException("Empty trips list"))
+                val resultTrips = mutableListOf<Trip>()
+
+                for (tripDto in trips) {
+                    val tripId = tripDto.id
+                    val participantsResponse = apiService.getParticipants(tripId)
+                    val budgetResponse = apiService.getBudget(tripId)
+                    val expensesResponse = apiService.getExpenses(tripId)
+                    if (participantsResponse.isSuccessful &&
+                        budgetResponse.isSuccessful &&
+                        expensesResponse.isSuccessful
+                    ) {
+                        val participants = participantsResponse.body() ?: emptyList()
+                        val budget = budgetResponse.body() ?: BudgetDto(0.0, listOf())
+                        val expenses = expensesResponse.body() ?: emptyList()
+                        resultTrips.add(
+                            tripDto.toDomain(
+                                participants = participants,
+                                budget = budget,
+                                expenses = expenses
+                            )
+                        )
+                    } else {
+                        return Result.failure(HttpException(participantsResponse))
+                    }
+                }
+                Result.success(resultTrips)
+            } else {
+                Result.failure(HttpException(tripsResponse))
+            }
         } catch (e: Exception) {
-            persistentListOf()
+            Result.failure(e)
         }
-        //apiService.getTrips().map { it.toDomain() }
     }
 
 
-    private val mockTrips = listOf(
-        Trip(
-            id = 1,
-            title = "Отпуск в Сочи",
-            startDate = LocalDate.now().plusDays(10),
-            endDate = LocalDate.now().plusDays(17),
-            participants = listOf(
-                User(1, "user1", "Иван", "Иванов", "+79991112233", "ivan@mail.com", ""),
-                User(2, "user2", "Мария", "Петрова", "+79992223344", "maria@mail.com", "")
-            ),
-            budget = 100000.0,
-            expenses = listOf(
-                Expense(1, "Билеты на поезд", 15000.0, 1, listOf(1, 2)),
-                Expense(2, "Отель", 40000.0, 2, listOf(1, 2))
-            ),
-            departureCity = "Казань",
-            destinationCity = "Сочи",
-            createdBy = 1
-        )
-    )
+    override suspend fun getTripDetails(tripId: Int): Result<Trip> {
+        return try {
+            if (tripId != -1) {
+                val trip = apiService.getTripDetails(tripId)
+                val participants = apiService.getParticipants(tripId)
+                val budget = apiService.getBudget(tripId)
+                val expenses = apiService.getExpenses(tripId)
+                if (trip.isSuccessful && participants.isSuccessful && budget.isSuccessful && expenses.isSuccessful) {
+                    val tripBody = trip.body()
+                    val participantsBody = participants.body()
+                    val budgetBody = budget.body()
+                    val expensesBody = expenses.body()
+                    if (tripBody != null && participantsBody != null && budgetBody != null && expensesBody != null) {
+                        Result.success(
+                            tripBody.toDomain(
+                                participants = participantsBody,
+                                budget = budgetBody,
+                                expenses = expensesBody
+                            )
+                        )
+                    } else {
+                        Result.failure(NullPointerException())
+                    }
+                } else {
+                    Result.failure(NullPointerException())
+                }
+            } else {
+                Result.failure(Exception(""))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun confirmParticipation(tripId: Int, participantId: Int): Result<Unit> {
+        return try {
+            apiService.confirmParticipation(tripId, participantId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

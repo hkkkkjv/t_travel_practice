@@ -2,6 +2,7 @@ package ru.kpfu.itis.t_travel.domain.model
 
 data class Expense(
     val id: Int,
+    val tripId: Long,
     val description: String,
     val amount: Double,
     val paidBy: Int,
@@ -10,6 +11,7 @@ data class Expense(
     companion object {
         fun mock() = Expense(
             id = 1,
+            tripId = 1,
             description = "Билеты на самолёт",
             amount = 40000.0,
             paidBy = 1,
