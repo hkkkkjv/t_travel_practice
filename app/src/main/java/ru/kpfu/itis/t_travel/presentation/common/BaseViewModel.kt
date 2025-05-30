@@ -2,18 +2,17 @@ package ru.kpfu.itis.t_travel.presentation.common
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import ru.kpfu.itis.t_travel.presentation.navigation.AppNavigator
 import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
+import javax.inject.Inject
 
 abstract class BaseViewModel : ViewModel() {
-    private val _navigationAction = MutableSharedFlow<NavigationAction>()
-    val navigationAction: SharedFlow<NavigationAction> = _navigationAction
-
+    @Inject
+    lateinit var appNavigator: AppNavigator
     protected fun navigate(action: NavigationAction) {
         viewModelScope.launch {
-            _navigationAction.emit(action)
+            appNavigator.navigate(action)
         }
     }
 }

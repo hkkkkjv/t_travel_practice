@@ -4,18 +4,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ru.kpfu.itis.t_travel.presentation.navigation.AppNavigation
+import ru.kpfu.itis.t_travel.presentation.navigation.AppNavigator
 import ru.kpfu.itis.t_travel.presentation.navigation.Screen
 
 @Composable
 fun MainHostScreen(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Welcome.route
+    startDestination: String = Screen.Welcome.route,
+    appNavigator: AppNavigator
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -25,7 +29,6 @@ fun MainHostScreen(
         Screen.More.route,
         Screen.Profile.route
     )
-
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
@@ -36,7 +39,11 @@ fun MainHostScreen(
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            AppNavigation(navController = navController, startDestination = startDestination)
+            AppNavigation(
+                navController = navController,
+                startDestination = startDestination,
+                navigationFlow = appNavigator.navigationAction
+            )
         }
     }
 }

@@ -1,11 +1,13 @@
 package ru.kpfu.itis.t_travel.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import kotlinx.coroutines.flow.Flow
 import ru.kpfu.itis.t_travel.presentation.screens.auth.login.LoginScreen
 import ru.kpfu.itis.t_travel.presentation.screens.auth.register.RegisterScreen
 import ru.kpfu.itis.t_travel.presentation.screens.auth.welcome.WelcomeScreen
@@ -37,8 +39,14 @@ sealed class Screen(val route: String) {
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    startDestination: String = Screen.Welcome.route
+    startDestination: String = Screen.Welcome.route,
+    navigationFlow: Flow<NavigationAction>
 ) {
+    LaunchedEffect(navigationFlow, navController) {
+        navigationFlow.collect { action ->
+            handleNavigationAction(action, navController)
+        }
+    }
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Welcome.route) {
             WelcomeScreen(
@@ -48,40 +56,20 @@ fun AppNavigation(
             )
         }
         composable(Screen.Login.route) {
-            LoginScreen(
-                onNavigationAction = { action ->
-                    handleNavigationAction(action, navController)
-                }
-            )
+            LoginScreen()
         }
 
         composable(Screen.Register.route) {
-            RegisterScreen(
-                onNavigationAction = { action ->
-                    handleNavigationAction(action, navController)
-                }
-            )
+            RegisterScreen()
         }
         composable(Screen.Home.route) {
-            HomeScreen(
-                onNavigationAction = { action ->
-                    handleNavigationAction(action, navController)
-                }
-            )
+            HomeScreen()
         }
         composable(Screen.Trips.route) {
-            TripScreen(
-                onNavigationAction = { action ->
-                    handleNavigationAction(action, navController)
-                }
-            )
+            TripScreen()
         }
         composable(Screen.More.route) {
-            MoreScreen(
-                onNavigationAction = { action ->
-                    handleNavigationAction(action, navController)
-                }
-            )
+            MoreScreen()
         }
         composable(Screen.Participants.route) { /* ... */ }
         composable(
@@ -91,10 +79,7 @@ fun AppNavigation(
             val tripId = backStackEntry.arguments?.getInt("tripId")
             if (tripId != null && tripId != -1) {
                 TripDetailsScreen(
-                    tripId = tripId,
-                    onNavigationAction = { action ->
-                        handleNavigationAction(action, navController)
-                    }
+                    tripId = tripId
                 )
             }
         }

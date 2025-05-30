@@ -31,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -52,20 +51,13 @@ import ru.kpfu.itis.t_travel.domain.model.Participant
 import ru.kpfu.itis.t_travel.domain.model.Trip
 import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBar
 import ru.kpfu.itis.t_travel.presentation.common.ui.shimmer
-import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 import java.time.LocalDate
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigationAction: (NavigationAction) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
-    LaunchedEffect(Unit) {
-        viewModel.navigationAction.collect { action ->
-            onNavigationAction(action)
-        }
-    }
     InternalHomeScreen(
         state = state,
         onEvent = viewModel::onEvent,
