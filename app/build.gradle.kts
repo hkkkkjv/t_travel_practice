@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
-    kotlin("plugin.serialization")
 }
 
 android {
@@ -18,9 +17,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-//        ksp {
-//            arg("room.schemaLocation", "$projectDir/schemas")
-//        }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
     }
 
     buildTypes {
