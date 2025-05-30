@@ -1,0 +1,19 @@
+package ru.kpfu.itis.t_travel.domain.model
+
+data class Expense(
+    val id: Int,
+    val description: String,
+    val amount: Double,
+    val paidBy: Int,
+    val beneficiaries: List<Int>
+){
+    companion object {
+        fun mock() = Expense(
+            id = 1,
+            description = "Билеты на самолёт",
+            amount = 40000.0,
+            paidBy = 1,
+            beneficiaries = listOf(1, 2)
+        )
+    }
+}

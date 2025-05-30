@@ -1,3 +1,36 @@
 <resources>
     <string name="app_name">t_travel</string>
+    <string name="participants_budget">Участники: %1$s, Бюджет: %2$s ₽</string>
+    <string name="trips">Поездки</string>
+    <string name="error">Ошибка</string>
+    <string name="refresh">Обновить</string>
+    <string name="retry">Повторить</string>
+    <string name="no_trips_available">Нет доступных поездок</string>
+    <string name="error_loading_trips">Ошибка загрузки экрана</string>
+    <string name="registration">Регистрация</string>
+    <string name="name">Имя</string>
+    <string name="phone">Телефон</string>
+    <string name="password">Пароль</string>
+    <string name="phone_cannot_be_empty">Телефон не может быть пустым</string>
+    <string name="home">Главная</string>
+    <string name="more">Еще</string>
+    <string name="not_registered_yet">Еще не зарегистрированы?</string>
+    <string name="login">Вход</string>
+    <string name="back">Назад</string>
+    <string name="ok">OK</string>
+    <string name="t_bank">T-Банк</string>
+    <string name="welcome">Добро пожаловать!</string>
+    <string name="passwords_do_not_match">Пароли не совпадают</string>
+    <string name="lastname">Фамилия</string>
+    <string name="confirm_password">Подтверждение пароля</string>
+    <string name="username">Имя пользователя</string>
+    <string name="blank_login_error">Логин не может быть пустым</string>
+    <string name="email_blank_error">Почта не может быть пустой</string>
+    <string name="phone_blank_error">Телефон не может быть пустым</string>
+    <string name="name_blank_error">Имя не может быть пустым</string>
+    <string name="lastname_blank_error">Фамилия не может быть пустой</string>
+    <string name="password_blank_error">Пароль не может быть пустым</string>
+    <string name="password_too_short_error">Пароль должен содержать минимум 6 символов</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="registration_error">Ошибка регистрации</string>
 </resources>
