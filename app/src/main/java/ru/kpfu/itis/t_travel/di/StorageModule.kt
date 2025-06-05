@@ -4,10 +4,16 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ru.kpfu.itis.t_travel.presentation.common.FavoriteTripManager
 import ru.kpfu.itis.t_travel.data.local.prefs.FavoriteTripManagerImpl
-import ru.kpfu.itis.t_travel.presentation.common.TokenManager
+import ru.kpfu.itis.t_travel.data.local.prefs.LanguageManagerImpl
+import ru.kpfu.itis.t_travel.data.local.prefs.ProfileManagerImpl
+import ru.kpfu.itis.t_travel.data.local.prefs.ThemeManagerImpl
 import ru.kpfu.itis.t_travel.data.local.prefs.TokenManagerImpl
+import ru.kpfu.itis.t_travel.presentation.common.FavoriteTripManager
+import ru.kpfu.itis.t_travel.presentation.common.LanguageManager
+import ru.kpfu.itis.t_travel.presentation.common.ProfileManager
+import ru.kpfu.itis.t_travel.presentation.common.ThemeManager
+import ru.kpfu.itis.t_travel.presentation.common.TokenManager
 import javax.inject.Singleton
 
 @Module
@@ -21,7 +27,26 @@ interface StorageModule {
 
     @Binds
     @Singleton
+    fun bindProfileManager(
+        profileManager: ProfileManagerImpl
+    ): ProfileManager
+
+    @Binds
+    @Singleton
+    fun bindThemeManager(
+        themeManager: ThemeManagerImpl
+    ): ThemeManager
+
+    @Binds
+    @Singleton
+    fun bindLanguageManager(
+        languageManager: LanguageManagerImpl
+    ): LanguageManager
+
+    @Binds
+    @Singleton
     fun bindFavoriteTripManager(
         favoriteTripManagerImpl: FavoriteTripManagerImpl
     ): FavoriteTripManager
+
 }
