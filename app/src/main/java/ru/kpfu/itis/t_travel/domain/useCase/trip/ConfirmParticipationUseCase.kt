@@ -6,7 +6,7 @@ import javax.inject.Inject
 class ConfirmParticipationUseCase @Inject constructor(
     private val tripRepository: TripRepository
 ) {
-    suspend operator fun invoke(tripId: Int, participantId: Int): Result<Unit> {
+    suspend operator fun invoke(tripId: Int, participantId: Int) {
         return tripRepository.confirmParticipation(tripId, participantId)
     }
 }
