@@ -13,9 +13,9 @@ import androidx.compose.ui.res.stringResource
 import ru.kpfu.itis.t_travel.R
 
 @Composable
-fun AlertDialog(
+fun PrimaryAlertDialog(
     title: String,
-    message: String,
+    message: @Composable () -> Unit,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
@@ -23,7 +23,7 @@ fun AlertDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
-        text = { Text(message) },
+        text = message,
         confirmButton = {
             Button(
                 onClick = onRetry,

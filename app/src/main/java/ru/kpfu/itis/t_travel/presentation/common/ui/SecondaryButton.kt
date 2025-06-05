@@ -10,9 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ru.kpfu.itis.t_travel.presentation.theme.Gray
 
 @Composable
-fun PrimaryButton(
+fun SecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -24,8 +25,8 @@ fun PrimaryButton(
             .fillMaxWidth()
             .height(56.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = Gray.copy(alpha = 0.5f),
+            contentColor = MaterialTheme.colorScheme.secondary
         ),
         shape = MaterialTheme.shapes.medium,
         enabled = enabled
@@ -34,7 +35,6 @@ fun PrimaryButton(
             text,
             fontSize = 16.sp,
             style = MaterialTheme.typography.bodyMedium
-
         )
     }
 }
