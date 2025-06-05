@@ -1,5 +1,6 @@
 package ru.kpfu.itis.t_travel.data.repository
 
+import ru.kpfu.itis.t_travel.data.model.UserRegistrationRequest
 import ru.kpfu.itis.t_travel.data.remote.ApiService
 import ru.kpfu.itis.t_travel.domain.model.AuthResult
 import ru.kpfu.itis.t_travel.domain.model.LoginCredentials
@@ -15,24 +16,48 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun login(credentials: LoginCredentials): AuthResult {
         return try {
             val response = apiService.login(credentials)
-            if (response.isSuccessful) {
-                response.body()?.toDomain()?.also { result ->
-                    if (result is AuthResult.Success) {
-                        tokenManager.saveToken(result.token)
-                    }
-                } ?: AuthResult.Error("Empty response body")
-            } else {
-                AuthResult.Error(
-                    message = response.errorBody()?.string() ?: "Unknown error",
-                    code = response.code()
-                )
+            response.toDomain().also { result ->
+                if (result is AuthResult.Success) {
+                    tokenManager.saveTokens(result.token, result.refreshToken)
+                }
             }
         } catch (e: Exception) {
-            AuthResult.Error(e.message ?: "Network error")
+            AuthResult.Error(e.message ?: "Ошибка сети")
         }
     }
 
-    override suspend fun register(user: User): AuthResult {
-        TODO("Not yet implemented")
+    override suspend fun register(
+        username: String,
+        firstName: String,
+        lastName: String,
+        email: String,
+        phone: String,
+        password: String
+    ): User {
+        val request = UserRegistrationRequest(
+            username = username,
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            phone = phone,
+            password = password
+        )
+        return apiService.register(request).toDomain()
     }
+
+    override suspend fun logout() {
+        try {
+            val refreshToken = tokenManager.getRefreshToken()
+            if (refreshToken != null) {
+                apiService.logout()
+            }
+        } finally {
+            tokenManager.clearTokens()
+        }
+    }
+
+    override suspend fun userId(): Int {
+        return apiService.getUserId()
+    }
+
 }

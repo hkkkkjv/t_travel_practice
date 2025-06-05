@@ -1,7 +1,8 @@
 package ru.kpfu.itis.t_travel.presentation.common
 
 interface TokenManager {
-    fun saveToken(token: String)
-    fun getToken(): String?
-    fun clearToken()
+    fun getAccessToken(): String?
+    fun getRefreshToken(): String?
+    fun saveTokens(access: String, refresh: String)
+    fun clearTokens()
 }

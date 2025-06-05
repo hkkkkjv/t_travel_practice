@@ -6,5 +6,15 @@ import ru.kpfu.itis.t_travel.domain.model.User
 
 interface AuthRepository {
     suspend fun login(credentials: LoginCredentials): AuthResult
-    suspend fun register(user: User): AuthResult
+    suspend fun register(
+        username: String,
+        firstName: String,
+        lastName: String,
+        email: String,
+        phone: String,
+        password: String
+    ): User
+
+    suspend fun logout()
+    suspend fun userId(): Int
 }
