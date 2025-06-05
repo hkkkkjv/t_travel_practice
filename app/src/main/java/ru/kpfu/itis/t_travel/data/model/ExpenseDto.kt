@@ -5,6 +5,7 @@ import ru.kpfu.itis.t_travel.domain.model.Expense
 
 data class ExpenseDto(
     @SerializedName("id") val id: Int,
+    @SerializedName("tripId") val tripId: Long,
     @SerializedName("description") val description: String,
     @SerializedName("amount") val amount: Double,
     @SerializedName("paidBy") val paidBy: Int,
@@ -13,10 +14,11 @@ data class ExpenseDto(
     fun toDomain(): Expense {
         return Expense(
             id = id,
+            tripId = tripId,
             description = description,
             amount = amount,
             paidBy = paidBy,
-            beneficiaries = beneficiaries
+            beneficiaries = beneficiaries,
         )
     }
 }

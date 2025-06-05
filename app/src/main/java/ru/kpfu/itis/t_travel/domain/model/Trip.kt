@@ -9,22 +9,25 @@ data class Trip(
     val endDate: LocalDate,
     val departureCity: String,
     val destinationCity: String,
-    val participants: List<User>,
-    val createdBy: Long,
-    val budget: Double,
+    val participants: List<Participant> = emptyList(),
+    val createdBy: Int,
+    val budget: Budget,
     val expenses: List<Expense>
-){
+) {
     companion object {
-        fun mock() = Trip(
-            id = 1,
+        fun mock(id: Int) = Trip(
+            id = id,
             title = "Отпуск в Сочи",
             startDate = LocalDate.now(),
             endDate = LocalDate.now().plusDays(7),
             departureCity = "Казань",
             destinationCity = "Сочи",
-            participants = listOf(User.mock()),
-            createdBy = 1,
-            budget = 100000.0,
+            participants = listOf(
+                Participant.mock(1),
+                Participant.mock(2)
+            ),
+            createdBy = id,
+            budget = Budget.mock(15000.0),
             expenses = listOf(Expense.mock())
         )
     }

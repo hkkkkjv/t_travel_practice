@@ -71,5 +71,7 @@ dependencies {
     implementation(libs.bundles.compose.base)
     implementation(libs.jetbrains.kotlinx.collections.immutable)
     implementation (libs.accompanist.systemuicontroller)
+    implementation(libs.kotlinx.serialization.json)
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
 }
