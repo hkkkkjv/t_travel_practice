@@ -12,7 +12,7 @@ data class AuthResponse(
 ) {
 
     fun toDomain(): AuthResult {
-        return AuthResult.Success(
+        return AuthResult(
             token = accessToken,
             refreshToken = refreshToken,
             refreshExpiresIn = refreshExpiresIn,

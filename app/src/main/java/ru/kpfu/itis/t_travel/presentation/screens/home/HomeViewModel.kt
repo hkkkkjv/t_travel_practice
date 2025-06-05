@@ -37,7 +37,10 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            currentUserId = getCurrentUserIdUseCase()
+            currentUserId = runSuspendCatching { getCurrentUserIdUseCase() }.getOrElse { error ->
+                _homeState.update { it.copy(error = error.message) }
+                return@launch
+            }
         }
         loadFavoriteTrip()
     }
