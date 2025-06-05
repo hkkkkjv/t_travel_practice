@@ -1,6 +1,7 @@
 package ru.kpfu.itis.t_travel.domain.model
 
 data class BudgetCategory(
+    val id: Int = -1,
     val category: String,
     val allocatedAmount: Double
 ) {
