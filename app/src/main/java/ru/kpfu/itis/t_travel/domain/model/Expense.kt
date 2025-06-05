@@ -1,13 +1,26 @@
 package ru.kpfu.itis.t_travel.domain.model
 
+import ru.kpfu.itis.t_travel.data.model.ExpenseDto
+
 data class Expense(
-    val id: Int,
-    val tripId: Long,
+    val id: Int = -1,
+    val tripId: Int,
     val description: String,
     val amount: Double,
-    val paidBy: Int,
+    val paidBy: Int = -1,
+    val category: Int? = null,
     val beneficiaries: List<Int>
-){
+) {
+    fun toDto(): ExpenseDto {
+        return ExpenseDto(
+            tripId = tripId,
+            description = description,
+            amount = amount,
+            paidBy = paidBy,
+            beneficiaries = beneficiaries
+        )
+    }
+
     companion object {
         fun mock() = Expense(
             id = 1,
