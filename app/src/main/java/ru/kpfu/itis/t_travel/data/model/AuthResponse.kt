@@ -4,17 +4,20 @@ import com.google.gson.annotations.SerializedName
 import ru.kpfu.itis.t_travel.domain.model.AuthResult
 
 data class AuthResponse(
-    @SerializedName("token") val token: String,
-    @SerializedName("refreshToken") val refreshToken: String? = null,
-    @SerializedName("userId") val userId: Int,
-    @SerializedName("expiresIn") val expiresIn: Long? = null
+    @SerializedName("accessToken") val accessToken: String,
+    @SerializedName("refreshToken") val refreshToken: String,
+    @SerializedName("refreshExpiresIn") val refreshExpiresIn: Long,
+    @SerializedName("tokenType") val tokenType: String,
+    @SerializedName("expiresIn") val expiresIn: Long
 ) {
 
     fun toDomain(): AuthResult {
         return AuthResult.Success(
-            token = token,
+            token = accessToken,
             refreshToken = refreshToken,
-            userId = userId
+            refreshExpiresIn = refreshExpiresIn,
+            tokenType = tokenType,
+            expiresIn = expiresIn,
         )
     }
 }

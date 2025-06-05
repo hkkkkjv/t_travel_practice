@@ -10,4 +10,5 @@ sealed class RegisterEvent {
     data class ConfirmPasswordChanged(val value: String) : RegisterEvent()
     object RegisterClicked : RegisterEvent()
     object NavigateBack : RegisterEvent()
+    object ErrorDismissed : RegisterEvent()
 }

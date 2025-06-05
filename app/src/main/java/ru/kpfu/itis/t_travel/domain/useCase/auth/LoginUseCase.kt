@@ -9,12 +9,6 @@ class LoginUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
     suspend operator fun invoke(phone: String, password: String): AuthResult {
-        if (phone.isBlank()) {
-            throw IllegalArgumentException()
-        }
-        if (password.isBlank()) {
-            throw IllegalArgumentException()
-        }
         return authRepository.login(LoginCredentials(phone, password))
     }
 }

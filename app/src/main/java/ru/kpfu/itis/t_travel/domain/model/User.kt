@@ -15,7 +15,7 @@ data class User(
             firstName = "Иван",
             lastName = "Иванов",
             phone = "+79990001122",
-            email = "ivan@ivan.ru",
+            email = "ivan@ivan.RU",
         )
     }
 }
