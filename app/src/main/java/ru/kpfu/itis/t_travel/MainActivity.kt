@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val startDestination = if (tokenManager.getToken() != null) {
+            val startDestination = if (tokenManager.getAccessToken() != null) {
                 Screen.Home.route
             } else {
                 Screen.Welcome.route

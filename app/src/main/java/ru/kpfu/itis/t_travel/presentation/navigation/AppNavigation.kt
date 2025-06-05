@@ -13,8 +13,13 @@ import ru.kpfu.itis.t_travel.presentation.screens.auth.register.RegisterScreen
 import ru.kpfu.itis.t_travel.presentation.screens.auth.welcome.WelcomeScreen
 import ru.kpfu.itis.t_travel.presentation.screens.home.HomeScreen
 import ru.kpfu.itis.t_travel.presentation.screens.more.MoreScreen
+import ru.kpfu.itis.t_travel.presentation.screens.more.profile.ProfileScreen
+import ru.kpfu.itis.t_travel.presentation.screens.trips.addExpense.AddExpenseScreen
+import ru.kpfu.itis.t_travel.presentation.screens.trips.addParticipants.AddParticipantsScreen
+import ru.kpfu.itis.t_travel.presentation.screens.trips.budget.BudgetFlowScreen
+import ru.kpfu.itis.t_travel.presentation.screens.trips.create.NewTripScreen
 import ru.kpfu.itis.t_travel.presentation.screens.trips.details.TripDetailsScreen
-import ru.kpfu.itis.t_travel.presentation.screens.trips.ui.TripScreen
+import ru.kpfu.itis.t_travel.presentation.screens.trips.list.TripScreen
 
 sealed class Screen(val route: String) {
     object Welcome : Screen("welcome")
@@ -22,18 +27,18 @@ sealed class Screen(val route: String) {
     object Register : Screen("register")
     object Home : Screen("home")
     object TripCreate : Screen("trip_create")
+    object AddParticipants : Screen("add_participants/{tripId}")
+    object AddBudget : Screen("add_budget/{tripId}")
+    object AddExpense: Screen("add_expense/{tripId}")
     object Trips : Screen("trips")
     object More : Screen("more")
     object Budget : Screen("budget")
-    object ExpenseCategories : Screen("expense_categories")
     object BudgetDistribution : Screen("budget_distribution/{tripId}")
     object TripDetails : Screen("trip_details/{tripId}")
     object ExpensesTab : Screen("expenses_tab/{tripId}")
     object Profile : Screen("profile")
     object Settings : Screen("settings")
     object Participants : Screen("participants/{tripId}")
-    object MyDebts : Screen("my_debts")
-
 }
 
 @Composable
@@ -84,18 +89,39 @@ fun AppNavigation(
             }
         }
         composable(
-            route = Screen.BudgetDistribution.route,
+            route = Screen.AddBudget.route,
             arguments = listOf(navArgument("tripId") { type = NavType.IntType })
         ) { backStackEntry ->
             val tripId = backStackEntry.arguments?.getInt("tripId")
             if (tripId != null && tripId != -1) {
-
+                BudgetFlowScreen(
+                    tripId = tripId
+                )
             }
         }
-        composable(Screen.ExpensesTab.route) { /* ... */ }
-        composable(Screen.MyDebts.route) { /* ... */ }
-        composable(Screen.Profile.route) { /* ... */ }
-        composable(Screen.TripCreate.route) { /* ... */ }
+
+        composable(Screen.Profile.route) { ProfileScreen() }
+        composable(Screen.TripCreate.route) {
+            NewTripScreen()
+        }
+        composable(
+            route = Screen.AddParticipants.route,
+            arguments = listOf(navArgument("tripId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val tripId = backStackEntry.arguments?.getInt("tripId")
+            if (tripId != null && tripId != -1) {
+                AddParticipantsScreen(tripId = tripId)
+            }
+        }
+        composable(
+            route = Screen.AddExpense.route,
+            arguments = listOf(navArgument("tripId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val tripId = backStackEntry.arguments?.getInt("tripId")
+            if (tripId != null && tripId != -1) {
+                AddExpenseScreen(tripId = tripId)
+            }
+        }
     }
 }
 
@@ -127,6 +153,17 @@ private fun handleNavigationAction(action: NavigationAction, navController: NavH
 
         is NavigationAction.NavigateToTripCreate -> {
             navController.navigate(Screen.TripCreate.route)
+        }
+
+        is NavigationAction.NavigateToAddParticipants -> {
+            navController.navigate(Screen.AddParticipants.route.replace("{tripId}", action.tripId))
+        }
+        is NavigationAction.NavigateToAddExpense -> {
+            navController.navigate(Screen.AddExpense.route.replace("{tripId}", action.tripId))
+        }
+
+        is NavigationAction.NavigateToAddBudget -> {
+            navController.navigate(Screen.AddBudget.route.replace("{tripId}", action.tripId))
         }
 
         is NavigationAction.NavigateToTripDetails -> {
