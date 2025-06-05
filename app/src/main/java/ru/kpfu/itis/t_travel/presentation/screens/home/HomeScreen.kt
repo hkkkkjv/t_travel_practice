@@ -1,7 +1,6 @@
 package ru.kpfu.itis.t_travel.presentation.screens.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,8 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import ru.kpfu.itis.t_travel.R
-import ru.kpfu.itis.t_travel.domain.model.Budget
-import ru.kpfu.itis.t_travel.domain.model.Expense
 import ru.kpfu.itis.t_travel.domain.model.Participant
 import ru.kpfu.itis.t_travel.domain.model.Trip
 import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBar
@@ -189,7 +186,7 @@ fun HomeScreenContent(state: HomeState, onEvent: (HomeEvent) -> Unit) {
             item {
                 InfoBlockCard(
                     title = stringResource(R.string.all_budget),
-                    amount = state.favoriteTrip.budget.totalBudget,
+                    amount = state.budget?.totalBudget ?: 0.0,
                     iconResId = R.drawable.ic_budget, //ic_budget
                     onClick = { onEvent(HomeEvent.BudgetClicked) }
                 )
@@ -242,7 +239,7 @@ fun StepCard(text: String, step: Int, onClick: () -> Unit) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Text(text = "Шаг $step", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text(text = stringResource(R.string.step, step), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             Text(
                 text = text,
                 style = MaterialTheme.typography.titleLarge,
@@ -384,8 +381,8 @@ fun InfoBlockCard(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .fillMaxWidth(),
+        onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background
         ),
@@ -471,9 +468,7 @@ fun PreviewHomeScreenDetails() {
                     startDate = LocalDate.now(),
                     endDate = LocalDate.now().plusDays(5),
                     createdBy = 0, departureCity = "", destinationCity = "",
-                    participants = listOf(Participant.mock(1), Participant.mock(2)),
-                    budget = Budget.mock(10000.0),
-                    expenses = listOf(Expense.mock())
+                    description = "Питер"
                 ),
                 totalOperationsAmount = 52000.0,
                 participants = persistentListOf(
@@ -494,6 +489,7 @@ fun PreviewHomeScreenDetails() {
                         confirmed = true
                     )
                 ),
+
                 myExpensesAmount = 40000.0,
                 myDebtsAmount = 0.0,
                 owedToMeAmount = 5000.0,

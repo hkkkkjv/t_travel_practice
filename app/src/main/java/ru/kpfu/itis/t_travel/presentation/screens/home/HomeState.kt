@@ -2,6 +2,7 @@ package ru.kpfu.itis.t_travel.presentation.screens.home
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import ru.kpfu.itis.t_travel.domain.model.Budget
 import ru.kpfu.itis.t_travel.domain.model.Participant
 import ru.kpfu.itis.t_travel.domain.model.Trip
 
@@ -10,6 +11,7 @@ data class HomeState(
     val favoriteTrip: Trip? = null,
     val totalOperationsAmount: Double = 0.0,
     val participants: ImmutableList<Participant> = persistentListOf(),
+    val budget: Budget? = null,
     val myExpensesAmount: Double = 0.0,
     val myDebtsAmount: Double = 0.0,
     val owedToMeAmount: Double = 0.0,

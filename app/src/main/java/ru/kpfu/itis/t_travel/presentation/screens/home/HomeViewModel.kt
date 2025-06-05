@@ -2,31 +2,47 @@ package ru.kpfu.itis.t_travel.presentation.screens.home
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.kpfu.itis.t_travel.domain.useCase.auth.GetCurrentUserIdUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.GetTripBudgetUseCase
 import ru.kpfu.itis.t_travel.domain.useCase.trip.GetTripDetailsUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.GetTripExpensesUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.GetTripParticipantsUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.GetTripSettlementsUseCase
 import ru.kpfu.itis.t_travel.presentation.common.BaseViewModel
 import ru.kpfu.itis.t_travel.presentation.common.FavoriteTripManager
 import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
+import ru.kpfu.itis.t_travel.utils.runSuspendCatching
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getTripDetailsUseCase: GetTripDetailsUseCase,
+    private val getTripParticipantsUseCase: GetTripParticipantsUseCase,
+    private val getTripExpensesUseCase: GetTripExpensesUseCase,
+    private val getTripSettlementsUseCase: GetTripSettlementsUseCase,
+    private val getTripBudgetUseCase: GetTripBudgetUseCase,
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val favoriteTripManager: FavoriteTripManager
 ) : BaseViewModel() {
 
     private val _homeState = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _homeState.asStateFlow()
+    private var currentUserId: Int = -1
 
     init {
+        viewModelScope.launch {
+            currentUserId = getCurrentUserIdUseCase()
+        }
         loadFavoriteTrip()
     }
 
-    private fun loadFavoriteTrip() {
+    private fun loadFavoriteTrip(forceRefresh: Boolean = false) {
         viewModelScope.launch {
             val favoriteTripId = favoriteTripManager.getFavoriteTripId()
 
@@ -39,19 +55,96 @@ class HomeViewModel @Inject constructor(
                         favoriteTripId = favoriteTripId
                     )
                 }
-                val result =
+                runSuspendCatching {
                     getTripDetailsUseCase(favoriteTripId)
-                result.onSuccess { trip ->
+                }.onSuccess { trip ->
                     _homeState.update {
                         it.copy(
                             favoriteTrip = trip,
-                            // TODO: Рассчитать totalOperationsAmount, myExpensesAmount и т.д. на основе favoriteTrip
                             isLoading = false,
                             showSetupSteps = false
                         )
                     }
                 }.onFailure { error ->
                     _homeState.update { it.copy(isLoading = false, error = error.message) }
+                }
+                runSuspendCatching {
+                    getTripParticipantsUseCase(
+                        favoriteTripId,
+                        forceRefresh = forceRefresh
+                    )
+                }.onSuccess { participants ->
+                    _homeState.update { it.copy(participants = participants.toImmutableList()) }
+                }.onFailure { error ->
+                    _homeState.update { it.copy(error = error.message) }
+                }
+                runSuspendCatching {
+                    getTripParticipantsUseCase(
+                        favoriteTripId,
+                        forceRefresh = forceRefresh
+                    )
+                }.onSuccess { participants ->
+                    _homeState.update { it.copy(participants = participants.toImmutableList()) }
+                }.onFailure { error ->
+                    _homeState.update { it.copy(error = error.message) }
+                    return@onFailure
+                }
+                runSuspendCatching {
+                    getTripBudgetUseCase(favoriteTripId)
+                }.onSuccess { budget ->
+                    _homeState.update { it.copy(budget = budget) }
+                }.onFailure { error ->
+                    _homeState.update { it.copy(error = error.message) }
+                    return@onFailure
+                }
+                runSuspendCatching {
+                    getTripExpensesUseCase(favoriteTripId)
+                }.onSuccess { expenses ->
+                    val totalAmount = expenses.sumOf { it.amount }
+                    val myExpensesAmount =
+                        expenses.filter { it.paidBy == currentUserId }.sumOf { it.amount }
+                    _homeState.update {
+                        it.copy(
+                            totalOperationsAmount = totalAmount,
+                            myExpensesAmount = myExpensesAmount
+                        )
+                    }
+                }.onFailure { error ->
+                    _homeState.update { it.copy(error = error.message) }
+                    return@onFailure
+                }
+                runSuspendCatching {
+                    getTripSettlementsUseCase(favoriteTripId)
+                }.onSuccess { settlements ->
+                    val myDebts =
+                        settlements.settlements.filter { it.to == currentUserId }
+                            .sumOf { it.amount }
+                    val owedToMe =
+                        settlements.settlements.filter { it.from == currentUserId }
+                            .sumOf { it.amount }
+                    val owedToMeParticipants = settlements.settlements
+                        .asSequence()
+                        .filter { it.from == currentUserId }
+                        .map { it.to }
+                        .distinct()
+                        .map { participantId ->
+                            state.value.participants.find { it.id == participantId }
+                        }
+                        .filterNotNull()
+                        .toList()
+
+                    _homeState.update {
+                        it.copy(
+                            myDebtsAmount = myDebts,
+                            owedToMeAmount = owedToMe,
+                            owedToMeParticipants = owedToMeParticipants.toImmutableList(),
+                            isLoading = false,
+                            showSetupSteps = false
+                        )
+                    }
+                }.onFailure { error ->
+                    _homeState.update { it.copy(error = error.message) }
+                    return@onFailure
                 }
             } else {
                 _homeState.update {
@@ -67,7 +160,7 @@ class HomeViewModel @Inject constructor(
 
     fun onEvent(event: HomeEvent) {
         when (event) {
-            HomeEvent.Refresh -> loadFavoriteTrip()
+            HomeEvent.Refresh -> loadFavoriteTrip(forceRefresh = true)
             HomeEvent.LoadTripDetails -> loadFavoriteTrip()
             HomeEvent.AllOperationsClicked -> state.value.favoriteTripId?.let { tripId ->
                 navigate(
@@ -75,17 +168,12 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            HomeEvent.ParticipantsListClicked -> state.value.favoriteTripId?.let { tripId ->
-                navigate(
-                    NavigationAction.NavigateToParticipants(
-                        tripId.toString()
-                    )
-                )
+            HomeEvent.ParticipantsListClicked -> {/*открытие bottom sheet*/
             }
 
             HomeEvent.BudgetClicked -> state.value.favoriteTripId?.let { tripId ->
                 navigate(
-                    NavigationAction.NavigateToBudgetDistribution(tripId.toString())
+                    NavigationAction.NavigateToTripDetails(tripId.toString())
                 )
             }
 

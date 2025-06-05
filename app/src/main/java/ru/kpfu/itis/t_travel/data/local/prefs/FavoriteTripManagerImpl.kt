@@ -2,13 +2,11 @@ package ru.kpfu.itis.t_travel.data.local.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
 import androidx.core.content.edit
+import dagger.hilt.android.qualifiers.ApplicationContext
 import ru.kpfu.itis.t_travel.presentation.common.FavoriteTripManager
+import javax.inject.Inject
 
-@Singleton
 class FavoriteTripManagerImpl @Inject constructor(
     @ApplicationContext context: Context
 ) : FavoriteTripManager {
