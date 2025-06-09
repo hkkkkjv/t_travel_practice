@@ -254,7 +254,7 @@ fun HomeScreenContent(state: HomeState, onEvent: (HomeEvent) -> Unit) {
             item {
                 InfoBlockCard(
                     title = stringResource(R.string.my_debts),
-                    amount = state.totalReceivableAmount,
+                    amount = state.totalPayableAmount,
                     iconResId = R.drawable.ic_debt, //ic_debt
                     participants = state.debtsParticipants,
                     onClick = { onEvent(HomeEvent.MyDebtsClicked) }
@@ -264,7 +264,7 @@ fun HomeScreenContent(state: HomeState, onEvent: (HomeEvent) -> Unit) {
             item {
                 InfoBlockCard(
                     title = stringResource(R.string.owed_to_me),
-                    amount = state.totalPayableAmount,
+                    amount = state.totalReceivableAmount,
                     iconResId = R.drawable.ic_owed_to_me, // ic_owed_to_me
                     participants = state.participantsOwedToMe,
                     onClick = { onEvent(HomeEvent.OwedToMeClicked) }

@@ -160,7 +160,8 @@
     <string name="my_trips">Мои поездки</string>
     <string name="awaiting_confirmation">Ожидает подтверждения</string>
     <string name="changes">Изменения</string>
-    <string name="logo">Logo</string>
+    <string name="logo">Логотип</string>
     <string name="new_notification">Новое уведомление</string>
     <string name="the_trip_don_t_have_budget_so_you_have_not_trip"> Поездка не имеет бюджета. Поэтому… вы никуда не едете :)"</string>
+    <string name="adding_error">Ошибка добавления</string>
 </resources>

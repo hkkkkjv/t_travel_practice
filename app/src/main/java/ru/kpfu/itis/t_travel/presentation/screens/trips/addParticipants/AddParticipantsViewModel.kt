@@ -16,6 +16,8 @@ import ru.kpfu.itis.t_travel.domain.useCase.trip.participant.AddParticipantsUseC
 import ru.kpfu.itis.t_travel.domain.useCase.trip.participant.GetTripParticipantsUseCase
 import ru.kpfu.itis.t_travel.presentation.common.BaseViewModel
 import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
+import ru.kpfu.itis.t_travel.presentation.screens.auth.register.RegisterState
+import ru.kpfu.itis.t_travel.utils.Constants
 import ru.kpfu.itis.t_travel.utils.runSuspendCatching
 import javax.inject.Inject
 
@@ -94,8 +96,10 @@ class AddParticipantsViewModel @Inject constructor(
     private fun addParticipant() {
         val id = tripId ?: return
         val phone = state.value.phoneInput.trim()
-        if (phone.isBlank()) {
-            onEvent(AddParticipantsEvent.Error(context.getString(R.string.phone_blank_error)))
+        val currentState = _state.value
+        val inputError = validateRegistrationInput(currentState)
+        if (inputError != null) {
+            onEvent(AddParticipantsEvent.Error(inputError))
             return
         }
         _state.update { it.copy(isAdding = true) }
@@ -112,8 +116,17 @@ class AddParticipantsViewModel @Inject constructor(
                     loadParticipants()
                     onEvent(AddParticipantsEvent.ParticipantAdded)
                 }.onFailure {
-                    onEvent(AddParticipantsEvent.Error(it.message ?: "Ошибка добавления"))
+                    onEvent(AddParticipantsEvent.Error(it.message ?: context.getString(R.string.adding_error)))
                 }
+        }
+    }
+
+    private fun validateRegistrationInput(state: AddParticipantsState): String? {
+        return when {
+            state.phoneInput.isBlank() -> context.getString(R.string.phone_blank_error)
+            !state.phoneInput.matches(Constants.Validation.PHONE_REGEX) -> context.getString(R.string.incorrect_phone_number)
+            else -> null
+
         }
     }
 }
