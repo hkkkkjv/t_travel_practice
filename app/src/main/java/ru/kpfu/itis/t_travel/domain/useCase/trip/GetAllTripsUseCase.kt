@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetAllTripsUseCase @Inject constructor(
     private val tripRepository: TripRepository
 ) {
-    suspend operator fun invoke(): Result<List<Trip>> {
-        return tripRepository.getTrips()
+    suspend operator fun invoke( forceRefresh: Boolean): List<Trip> {
+        return tripRepository.getTrips( forceRefresh =forceRefresh)
     }
 }

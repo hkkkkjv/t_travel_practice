@@ -7,6 +7,7 @@ data class Participant(
     val contact: String,
     val confirmed: Boolean
 ) {
+
     companion object {
         fun mock(id: Int = 1) = Participant(
             id = id,

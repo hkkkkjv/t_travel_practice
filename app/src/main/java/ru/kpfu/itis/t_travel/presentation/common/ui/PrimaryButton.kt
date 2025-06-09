@@ -15,7 +15,8 @@ import androidx.compose.ui.unit.sp
 fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Button(
         onClick = onClick,
@@ -26,8 +27,14 @@ fun PrimaryButton(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
+        enabled = enabled
     ) {
-        Text(text, fontSize = 16.sp)
+        Text(
+            text,
+            fontSize = 16.sp,
+            style = MaterialTheme.typography.bodyMedium
+
+        )
     }
 }

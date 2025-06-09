@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorSplashBackground">#FFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="category_tickets">#E57373</color>
+    <color name="category_hotels">#81C784</color>
+    <color name="category_food">#FFB74D</color>
+    <color name="category_entertainment">#64B5F6</color>
+    <color name="category_insurance">#BA68C8</color>
+    <color name="category_transport">#4DB6AC</color>
+    <color name="category_gifts">#FF8A65</color>
+    <color name="category_other">#90A4AE</color>
 </resources>

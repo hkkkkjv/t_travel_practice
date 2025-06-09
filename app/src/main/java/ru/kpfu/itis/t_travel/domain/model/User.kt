@@ -7,6 +7,7 @@ data class User(
     val lastName: String,
     val phone: String,
     val email: String,
+    val password: String = ""
 ) {
     companion object {
         fun mock() = User(
@@ -15,7 +16,7 @@ data class User(
             firstName = "Иван",
             lastName = "Иванов",
             phone = "+79990001122",
-            email = "ivan@ivan.ru",
+            email = "ivan@ivan.RU",
         )
     }
 }

@@ -6,15 +6,12 @@ import ru.kpfu.itis.t_travel.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val sendFcmTokenUseCase: SendFcmTokenUseCase
 ) {
     suspend operator fun invoke(phone: String, password: String): AuthResult {
-        if (phone.isBlank()) {
-            throw IllegalArgumentException()
-        }
-        if (password.isBlank()) {
-            throw IllegalArgumentException()
-        }
-        return authRepository.login(LoginCredentials(phone, password))
+        val result = authRepository.login(LoginCredentials(phone, password))
+        sendFcmTokenUseCase()
+        return result
     }
 }

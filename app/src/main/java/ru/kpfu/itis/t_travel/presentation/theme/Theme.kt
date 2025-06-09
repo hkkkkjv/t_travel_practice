@@ -8,6 +8,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
@@ -33,7 +34,8 @@ private val DarkColorScheme = darkColorScheme(
     onSecondary = OnSecondary,
     onBackground = Color.White,
     onSurface = Color.White,
-    onError = OnError
+    onError = OnError,
+
 )
 
 @Composable
@@ -41,6 +43,11 @@ fun TravelTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setStatusBarColor(
+        color = if (darkTheme) DarkGray else Background,
+        darkIcons = true
+    )
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     MaterialTheme(
         colorScheme = colorScheme,

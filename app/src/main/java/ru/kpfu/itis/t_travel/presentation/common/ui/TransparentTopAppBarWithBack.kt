@@ -1,5 +1,6 @@
 package ru.kpfu.itis.t_travel.presentation.common.ui
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -24,7 +25,9 @@ import ru.kpfu.itis.t_travel.R
 @Composable
 fun TransparentTopAppBarWithBack(
     title: String,
+    titleColor: Color = MaterialTheme.colorScheme.onBackground,
     onBackClick: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val systemUiController = rememberSystemUiController()
@@ -35,11 +38,12 @@ fun TransparentTopAppBarWithBack(
     TopAppBar(
         title = {
             Text(
-                title,
+                text = title,
                 style = MaterialTheme.typography.headlineMedium,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 20.dp),
+                color = titleColor
             )
         },
         navigationIcon = {
@@ -57,6 +61,7 @@ fun TransparentTopAppBarWithBack(
             titleContentColor = MaterialTheme.colorScheme.onBackground,
             navigationIconContentColor = MaterialTheme.colorScheme.secondary
         ),
+        actions = actions,
         modifier = modifier.padding(vertical = 8.dp, horizontal = 8.dp)
     )
 }

@@ -1,5 +1,8 @@
 package ru.kpfu.itis.t_travel.presentation.screens.auth.register
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class RegisterState(
     val username: String = "",
     val email: String = "",

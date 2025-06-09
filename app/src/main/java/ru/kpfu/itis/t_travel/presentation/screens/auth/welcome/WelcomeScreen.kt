@@ -14,11 +14,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.presentation.common.ui.PrimaryButton
 
@@ -26,11 +24,6 @@ import ru.kpfu.itis.t_travel.presentation.common.ui.PrimaryButton
 fun WelcomeScreen(
     navigateLoginScreen: () -> Unit
 ) {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(
-        color = Color.White,
-        darkIcons = true
-    )
     Column(
         modifier = Modifier
             .fillMaxSize()
