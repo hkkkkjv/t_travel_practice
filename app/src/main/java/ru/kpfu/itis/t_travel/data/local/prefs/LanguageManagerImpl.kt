@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
-import ru.kpfu.itis.t_travel.presentation.common.LanguageManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.LanguageManager
 import javax.inject.Inject
 
 class LanguageManagerImpl @Inject constructor(

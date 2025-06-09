@@ -42,11 +42,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.domain.model.Participant
 import ru.kpfu.itis.t_travel.domain.model.Trip
+import ru.kpfu.itis.t_travel.presentation.common.ui.ExpensesBottomSheet
+import ru.kpfu.itis.t_travel.presentation.common.ui.MyDebtsBottomSheet
+import ru.kpfu.itis.t_travel.presentation.common.ui.MyExpensesBottomSheet
+import ru.kpfu.itis.t_travel.presentation.common.ui.OweMeBottomSheet
+import ru.kpfu.itis.t_travel.presentation.common.ui.ParticipantsBottomSheet
 import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBar
+import ru.kpfu.itis.t_travel.presentation.common.ui.getAvatarColor
 import ru.kpfu.itis.t_travel.presentation.common.ui.shimmer
 import java.time.LocalDate
 
@@ -126,6 +133,49 @@ fun InternalHomeScreen(
 
 @Composable
 fun HomeScreenContent(state: HomeState, onEvent: (HomeEvent) -> Unit) {
+    if (state.showParticipantsSheet) {
+        ParticipantsBottomSheet(
+            participants = state.participants,
+            onDismiss = { onEvent(HomeEvent.DismissParticipantsSheet) },
+            onAddParticipant = {
+                state.favoriteTripId?.let { tripId ->
+                    onEvent(HomeEvent.AddParticipantsClicked(tripId))
+                }
+            }
+        )
+    }
+
+    if (state.showExpensesSheet) {
+        ExpensesBottomSheet(
+            expenses = state.expenses,
+            participants = state.participants,
+            onDismiss = { onEvent(HomeEvent.DismissExpensesSheet) }
+        )
+    }
+
+    if (state.showMyExpensesSheet) {
+        MyExpensesBottomSheet(
+            expenses = state.myExpenses,
+            participants = state.participants,
+            onDismiss = { onEvent(HomeEvent.DismissMyExpensesSheet) }
+        )
+    }
+    if (state.showOweMeSheet) {
+        OweMeBottomSheet(
+            settlements = state.oweMe,
+            participants = state.participants,
+            onConfirm = { onEvent(HomeEvent.ConfirmDebtReturn(it)) },
+            onDismiss = { onEvent(HomeEvent.DismissOweMeSheet) }
+        )
+    }
+    if (state.showMyDebtsSheet) {
+        MyDebtsBottomSheet(
+            settlements = state.myDebts,
+            participants = state.participants,
+            onRequest = { onEvent(HomeEvent.RequestDebtConfirmation(it)) },
+            onDismiss = { onEvent(HomeEvent.DismissMyDebtsSheet) }
+        )
+    }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -204,8 +254,9 @@ fun HomeScreenContent(state: HomeState, onEvent: (HomeEvent) -> Unit) {
             item {
                 InfoBlockCard(
                     title = stringResource(R.string.my_debts),
-                    amount = state.myDebtsAmount,
+                    amount = state.totalReceivableAmount,
                     iconResId = R.drawable.ic_debt, //ic_debt
+                    participants = state.debtsParticipants,
                     onClick = { onEvent(HomeEvent.MyDebtsClicked) }
                 )
             }
@@ -213,9 +264,9 @@ fun HomeScreenContent(state: HomeState, onEvent: (HomeEvent) -> Unit) {
             item {
                 InfoBlockCard(
                     title = stringResource(R.string.owed_to_me),
-                    amount = state.owedToMeAmount,
+                    amount = state.totalPayableAmount,
                     iconResId = R.drawable.ic_owed_to_me, // ic_owed_to_me
-                    participants = state.owedToMeParticipants,
+                    participants = state.participantsOwedToMe,
                     onClick = { onEvent(HomeEvent.OwedToMeClicked) }
                 )
             }
@@ -239,7 +290,11 @@ fun StepCard(text: String, step: Int, onClick: () -> Unit) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Text(text = stringResource(R.string.step, step), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text(
+                text = stringResource(R.string.step, step),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
             Text(
                 text = text,
                 style = MaterialTheme.typography.titleLarge,
@@ -351,12 +406,12 @@ fun ParticipantsCard(
                 }
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    repeat(participants.take(3).size) {
+                    repeat(participants.take(3).size) {index ->
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary),
+                                .background(getAvatarColor(index)),
                         )
                     }
                     if (participants.size > 3) {
@@ -377,7 +432,7 @@ fun InfoBlockCard(
     amount: Double,
     iconResId: Int,
     onClick: () -> Unit,
-    participants: List<Participant> = emptyList()
+    participants: ImmutableList<Participant> = persistentListOf()
 ) {
     Card(
         modifier = Modifier
@@ -421,15 +476,14 @@ fun InfoBlockCard(
                         )
                     }
                 }
-
                 if (participants.isNotEmpty()) {
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        repeat(participants.take(3).size) {
+                        repeat(participants.take(3).size) {index ->
                             Box(
                                 modifier = Modifier
-                                    .size(24.dp)
+                                    .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(Color.Cyan)
+                                    .background(getAvatarColor(index))
                             )
                         }
                         if (participants.size > 3) {
@@ -491,20 +545,6 @@ fun PreviewHomeScreenDetails() {
                 ),
 
                 myExpensesAmount = 40000.0,
-                myDebtsAmount = 0.0,
-                owedToMeAmount = 5000.0,
-                owedToMeParticipants = persistentListOf(
-                    Participant(
-                        id = 1,
-                        name = "E",
-                        contact = "",
-                        tripId = 1,
-                        confirmed = true
-                    ),
-                    Participant(id = 2, name = "A", contact = "", tripId = 1, confirmed = true),
-                    Participant(id = 3, name = "O", contact = "", tripId = 1, confirmed = true),
-                    Participant(id = 4, name = "P", contact = "", tripId = 1, confirmed = true)
-                ),
                 showSetupSteps = false
             ),
             onEvent = {}

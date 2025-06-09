@@ -11,10 +11,10 @@ import ru.kpfu.itis.t_travel.data.local.database.entity.ExpenseEntity
 
 @Dao
 interface ExpenseDao {
-    @Query("SELECT * FROM expenses WHERE tripId = :tripId")
-    fun getExpensesForTrip(tripId: Int): List<ExpenseEntity>
+    @Query("SELECT * FROM expenses WHERE trip_id = :tripId")
+    suspend fun getExpensesForTrip(tripId: Int): List<ExpenseEntity>
 
-    @Query("SELECT * FROM expense_beneficiaries WHERE expenseId = :expenseId")
+    @Query("SELECT * FROM expense_beneficiaries WHERE expense_id = :expenseId")
     suspend fun getBeneficiariesForExpense(expenseId: Int): List<ExpenseBeneficiaryEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -32,15 +32,15 @@ interface ExpenseDao {
     @Delete
     suspend fun deleteExpense(expense: ExpenseEntity)
 
-    @Query("DELETE FROM expenses WHERE tripId = :tripId")
+    @Query("DELETE FROM expenses WHERE trip_id = :tripId")
     suspend fun deleteExpensesForTrip(tripId: Int)
 
-    @Query("DELETE FROM expense_beneficiaries WHERE expenseId = :expenseId")
+    @Query("DELETE FROM expense_beneficiaries WHERE expense_id = :expenseId")
     suspend fun deleteBeneficiariesForExpense(expenseId: Int)
 
-    @Query("SELECT * FROM expenses WHERE tripId = :tripId AND lastUpdated < :timestamp")
+    @Query("SELECT * FROM expenses WHERE trip_id = :tripId AND last_updated < :timestamp")
     suspend fun getStaleExpenses(tripId: Int, timestamp: Long): List<ExpenseEntity>
 
-    @Query("SELECT * FROM expense_beneficiaries WHERE expenseId IN (SELECT id FROM expenses WHERE tripId = :tripId) AND lastUpdated < :timestamp")
+    @Query("SELECT * FROM expense_beneficiaries WHERE expense_id IN (SELECT id FROM expenses WHERE trip_id = :tripId) AND last_updated < :timestamp")
     suspend fun getStaleBeneficiaries(tripId: Int, timestamp: Long): List<ExpenseBeneficiaryEntity>
 } 

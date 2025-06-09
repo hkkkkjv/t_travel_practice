@@ -95,7 +95,7 @@ class RegisterViewModel @Inject constructor(
             state.lastName.isBlank() -> context.getString(R.string.lastname_blank_error)
             !state.lastName.matches(Constants.Validation.NAME_REGEX) -> context.getString(R.string.incorrect_lastname)
             state.username.isBlank() -> context.getString(R.string.blank_login_error)
-            !state.username.matches(Constants.Validation.USERNAME_REGEX) -> context.getString(R.string.incorrect_login)
+            !state.username.matches(Constants.Validation.USERNAME_REGEX) -> context.getString(R.string.invalid_username)
             state.email.isBlank() -> context.getString(R.string.email_blank_error)
             !state.email.matches(Constants.Validation.EMAIL_REGEX) -> context.getString(R.string.incorrect_email)
             state.phone.isBlank() -> context.getString(R.string.phone_blank_error)

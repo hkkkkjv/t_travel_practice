@@ -6,11 +6,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import ru.kpfu.itis.t_travel.presentation.navigation.AppNavigation
 import ru.kpfu.itis.t_travel.presentation.navigation.AppNavigator
 import ru.kpfu.itis.t_travel.presentation.navigation.Screen
@@ -21,11 +19,6 @@ fun MainHostScreen(
     startDestination: String = Screen.Welcome.route,
     appNavigator: AppNavigator
 ) {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(
-        color = Color.White,
-        darkIcons = true
-    )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val showBottomBar = currentRoute in listOf(

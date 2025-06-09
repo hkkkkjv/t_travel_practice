@@ -10,8 +10,8 @@ import ru.kpfu.itis.t_travel.data.local.database.entity.TripEntity
 
 @Dao
 interface TripDao {
-    @Query("SELECT * FROM trips ORDER BY startDate DESC")
-    fun getAllTrips(): List<TripEntity>
+    @Query("SELECT * FROM trips ORDER BY start_date DESC")
+    suspend fun getAllTrips(): List<TripEntity>
 
     @Query("SELECT * FROM trips WHERE id = :tripId")
     suspend fun getTripById(tripId: Int): TripEntity?
@@ -31,9 +31,9 @@ interface TripDao {
     @Query("DELETE FROM trips")
     suspend fun deleteAllTrips()
 
-    @Query("UPDATE trips SET isFavorite = :isFavorite WHERE id = :tripId")
+    @Query("UPDATE trips SET is_favorite = :isFavorite WHERE id = :tripId")
     suspend fun updateFavoriteStatus(tripId: Int, isFavorite: Boolean)
 
-    @Query("SELECT * FROM trips WHERE lastUpdated < :timestamp")
+    @Query("SELECT * FROM trips WHERE last_updated < :timestamp")
     suspend fun getStaleTrips(timestamp: Long): List<TripEntity>
 } 

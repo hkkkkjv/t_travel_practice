@@ -3,7 +3,9 @@ package ru.kpfu.itis.t_travel.data.remote.interceptor
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
-import ru.kpfu.itis.t_travel.presentation.common.TokenManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.FavoriteTripManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.ProfileManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.TokenManager
 import ru.kpfu.itis.t_travel.presentation.navigation.AppNavigator
 import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 import javax.inject.Inject
@@ -12,7 +14,9 @@ import javax.inject.Singleton
 @Singleton
 class AuthInterceptor @Inject constructor(
     private val tokenManager: TokenManager,
-    private val appNavigator: AppNavigator
+    private val appNavigator: AppNavigator,
+    private val favoriteTripManager: FavoriteTripManager,
+    private val profileManager: ProfileManager
 ) : Interceptor {
 
     companion object {
@@ -27,7 +31,7 @@ class AuthInterceptor @Inject constructor(
 
         val response = if (!accessToken.isNullOrBlank()) {
             val authenticatedRequest = request.newBuilder()
-                .header("Authorization", "Bearer $accessToken")
+                .header(AUTHORIZATION_HEADER, "$BEARER_PREFIX$accessToken")
                 .build()
             chain.proceed(authenticatedRequest)
         } else {
@@ -36,7 +40,10 @@ class AuthInterceptor @Inject constructor(
         if (response.code == 403) {
             runBlocking {
                 tokenManager.clearTokens()
+                favoriteTripManager.clearFavoriteTrip()
+                profileManager.clearAvatarUri()
                 appNavigator.navigate(NavigationAction.NavigateToLogin)
+
             }
         }
         return response

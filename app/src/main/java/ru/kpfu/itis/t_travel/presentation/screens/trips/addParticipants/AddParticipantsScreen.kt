@@ -44,12 +44,14 @@ import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBar
 @Composable
 fun AddParticipantsScreen(
     tripId: Int,
+    isFromBottomSheet: Boolean = false,
     viewModel: AddParticipantsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     InternalAddParticipantsScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        isFromBottomSheet = isFromBottomSheet
     )
     LaunchedEffect(tripId) {
         viewModel.init(tripId)
@@ -59,6 +61,7 @@ fun AddParticipantsScreen(
 @Composable
 fun InternalAddParticipantsScreen(
     state: AddParticipantsState,
+    isFromBottomSheet: Boolean,
     onEvent: (AddParticipantsEvent) -> Unit,
 ) {
     Scaffold(
@@ -98,10 +101,15 @@ fun InternalAddParticipantsScreen(
                 Spacer(Modifier.weight(1f))
                 PrimaryButton(
                     text = stringResource(R.string.next),
-                    onClick = { onEvent(AddParticipantsEvent.NextClicked) },
+                    onClick = if (!isFromBottomSheet) {
+                        { onEvent(AddParticipantsEvent.NextClicked) }
+                    } else {
+                        { onEvent(AddParticipantsEvent.BackClicked) }
+                    },
                     enabled = !state.isLoading,
                     modifier = Modifier.fillMaxWidth(),
                 )
+
             }
 
             if (state.showAddSheet) {

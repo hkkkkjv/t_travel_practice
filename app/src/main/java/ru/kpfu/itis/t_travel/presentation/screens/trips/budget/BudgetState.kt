@@ -1,9 +1,11 @@
 package ru.kpfu.itis.t_travel.presentation.screens.trips.budget
 
+import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
+@Immutable
 data class BudgetState(
     val currentScreen: BudgetScreens = BudgetScreens.Input,
     val totalBudget: String = "",

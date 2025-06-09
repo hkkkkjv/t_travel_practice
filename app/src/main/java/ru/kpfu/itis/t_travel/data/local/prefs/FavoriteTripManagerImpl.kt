@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
-import ru.kpfu.itis.t_travel.presentation.common.FavoriteTripManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.FavoriteTripManager
 import javax.inject.Inject
 
 class FavoriteTripManagerImpl @Inject constructor(

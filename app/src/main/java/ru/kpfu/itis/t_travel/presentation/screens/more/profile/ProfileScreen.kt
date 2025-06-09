@@ -44,9 +44,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import ru.kpfu.itis.t_travel.R
-import ru.kpfu.itis.t_travel.presentation.common.AppLanguage
-import ru.kpfu.itis.t_travel.presentation.common.AppTheme
+import ru.kpfu.itis.t_travel.presentation.common.settings.AppLanguage
+import ru.kpfu.itis.t_travel.presentation.common.settings.AppTheme
+import ru.kpfu.itis.t_travel.presentation.common.ui.CustomTextField
 import ru.kpfu.itis.t_travel.presentation.common.ui.ErrorDialog
+import ru.kpfu.itis.t_travel.presentation.common.ui.PrimaryButton
 import ru.kpfu.itis.t_travel.presentation.common.ui.SecondaryButton
 import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBarWithBack
 
@@ -98,7 +100,9 @@ fun InternalProfileScreen(
                             AsyncImage(
                                 model = state.avatarUri,
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.background),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
@@ -292,4 +296,62 @@ fun LanguageDialog(
         containerColor = MaterialTheme.colorScheme.background
 
     )
+}
+
+@Composable
+fun EditProfileScreen(
+    viewModel: ProfileViewModel = hiltViewModel(),
+) {
+    val state = viewModel.state.collectAsState().value
+    Scaffold(
+        topBar = {
+            TransparentTopAppBarWithBack(
+                title = stringResource(R.string.changes),
+                onBackClick = { viewModel.onEvent(ProfileEvent.BackClicked) }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            CustomTextField(
+                value = state.firstName,
+                onValueChange = { viewModel.onEvent(ProfileEvent.FirstNameChanged(it)) },
+                label = stringResource(R.string.name)
+            )
+            Spacer(Modifier.height(16.dp))
+            CustomTextField(
+                value = state.lastName,
+                onValueChange = { viewModel.onEvent(ProfileEvent.LastNameChanged(it)) },
+                label = stringResource(R.string.lastname)
+            )
+            Spacer(Modifier.height(16.dp))
+            CustomTextField(
+                value = state.phone,
+                onValueChange = { viewModel.onEvent(ProfileEvent.PhoneChanged(it)) },
+                label = stringResource(R.string.phone)
+            )
+            Spacer(Modifier.height(16.dp))
+            CustomTextField(
+                value = state.email,
+                onValueChange = { viewModel.onEvent(ProfileEvent.EmailChanged(it)) },
+                label = stringResource(R.string.email),
+            )
+            Spacer(Modifier.weight(1f))
+            PrimaryButton(
+                text = stringResource(R.string.save_changes),
+                onClick = { viewModel.onEvent(ProfileEvent.SaveProfileClicked) },
+                enabled = !state.isSaving
+            )
+            if (state.error != null) {
+                ErrorDialog(
+                    onDismiss = { viewModel.onEvent(ProfileEvent.ErrorDismissed) },
+                    error = state.error,
+                )
+            }
+        }
+    }
 }

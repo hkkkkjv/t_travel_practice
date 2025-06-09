@@ -6,6 +6,7 @@ sealed class AddParticipantsEvent {
     data class PhoneInputChanged(val value: String) : AddParticipantsEvent()
     object AddClicked : AddParticipantsEvent()
     object NextClicked : AddParticipantsEvent()
+    object BackClicked : AddParticipantsEvent()
     object ParticipantAdded : AddParticipantsEvent()
     data class Error(val message: String) : AddParticipantsEvent()
     object ErrorShown : AddParticipantsEvent()

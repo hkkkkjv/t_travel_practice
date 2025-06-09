@@ -3,7 +3,7 @@ package ru.kpfu.itis.t_travel.data.local.prefs
 import android.content.Context
 import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
-import ru.kpfu.itis.t_travel.presentation.common.ThemeManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.ThemeManager
 import javax.inject.Inject
 
 class ThemeManagerImpl @Inject constructor(

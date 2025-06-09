@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.domain.model.Budget
 import ru.kpfu.itis.t_travel.domain.model.BudgetCategory
-import ru.kpfu.itis.t_travel.domain.useCase.trip.create.SetBudgetUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.budget.SetBudgetUseCase
 import ru.kpfu.itis.t_travel.presentation.common.BaseViewModel
 import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 import ru.kpfu.itis.t_travel.utils.runSuspendCatching

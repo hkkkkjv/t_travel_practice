@@ -8,12 +8,15 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import ru.kpfu.itis.t_travel.data.model.AuthResponse
 import ru.kpfu.itis.t_travel.data.model.BudgetCategoryDto
+import ru.kpfu.itis.t_travel.data.model.BudgetCategoryLookupDto
 import ru.kpfu.itis.t_travel.data.model.BudgetDto
+import ru.kpfu.itis.t_travel.data.model.DeviceTokenRequest
 import ru.kpfu.itis.t_travel.data.model.ExpenseDto
 import ru.kpfu.itis.t_travel.data.model.NotificationDto
 import ru.kpfu.itis.t_travel.data.model.ParticipantDto
 import ru.kpfu.itis.t_travel.data.model.ParticipantPhoneRequest
 import ru.kpfu.itis.t_travel.data.model.SettlementDto
+import ru.kpfu.itis.t_travel.data.model.SettlementItemDto
 import ru.kpfu.itis.t_travel.data.model.TripDto
 import ru.kpfu.itis.t_travel.data.model.UserDto
 import ru.kpfu.itis.t_travel.data.model.UserRegistrationRequest
@@ -23,6 +26,12 @@ interface ApiService {
     // Trip endpoints
     @GET("v1/trips")
     suspend fun getTrips(): List<TripDto>
+
+    @GET("/v1/trips/pending")
+    suspend fun getPendingTrips(): List<TripDto>
+
+    @GET("/v1/trips/confirmed")
+    suspend fun getConfirmedTrips(): List<TripDto>
 
     @GET("/v1/trips/{tripId}")
     suspend fun getTripDetails(@Path("tripId") tripId: Int): TripDto
@@ -60,16 +69,14 @@ interface ApiService {
         @Path("participantId") participantId: Int
     )
 
-    @PUT("v1/trips/{tripId}/participants/{participantId}/confirm")
+    @PUT("v1/trips/{tripId}/participants/confirm")
     suspend fun confirmParticipation(
-        @Path("tripId") tripId: Int,
-        @Path("participantId") participantId: Int
+        @Path("tripId") tripId: Int
     )
 
-    @PUT("v1/trips/{tripId}/participants/{participantId}/cancel")
+    @PUT("v1/trips/{tripId}/participants/cancel")
     suspend fun rejectParticipation(
-        @Path("tripId") tripId: Int,
-        @Path("participantId") participantId: Int
+        @Path("tripId") tripId: Int
     )
 
     // Budget endpoints
@@ -114,6 +121,9 @@ interface ApiService {
     @GET("v1/trips/{tripId}/expenses")
     suspend fun getExpenses(@Path("tripId") tripId: Int): List<ExpenseDto>
 
+    @GET("v1/trips/{tripId}/expenses/me")
+    suspend fun getMyExpenses(@Path("tripId") tripId: Int): List<ExpenseDto>
+
     @POST("v1/trips/{tripId}/expenses")
     suspend fun addExpense(
         @Path("tripId") tripId: Int,
@@ -130,6 +140,25 @@ interface ApiService {
     @GET("v1/trips/{tripId}/settlements")
     suspend fun getSettlements(@Path("tripId") tripId: Int): SettlementDto
 
+    @GET("v1/trips/{tripId}/settlements/payable")
+    suspend fun getPayableSettlements(@Path("tripId") tripId: Int): List<SettlementItemDto>
+
+    @GET("v1/trips/{tripId}/settlements/receivable")
+    suspend fun getReceivableSettlements(@Path("tripId") tripId: Int): List<SettlementItemDto>
+
+    @PUT("v1/trips/{tripId}/settlements/{settlementId}/request-confirmation")
+    suspend fun requestDebtConfirmation(
+        @Path("tripId") tripId: Int,
+        @Path("settlementId") settlementId: Int
+    )
+
+    @PUT("v1/trips/{tripId}/settlements/{settlementId}/confirm")
+    suspend fun confirmDebtReturn(
+        @Path("tripId") tripId: Int,
+        @Path("settlementId") settlementId: Int
+    )
+
+    //User endpoints
     @POST("v1/register")
     suspend fun register(@Body request: UserRegistrationRequest): UserDto
 
@@ -151,9 +180,16 @@ interface ApiService {
     @DELETE("v1/user/notifications")
     suspend fun clearNotifications()
 
+    @GET("v1/budget/categories")
+    suspend fun getBudgetCategories(): List<BudgetCategoryLookupDto>
+
     @POST("v1/logout")
-    suspend fun logout()
+    suspend fun logout(@Body body: Map<String, String>)
 
     @GET("/v1/user/id")
     suspend fun getUserId(): Int
+
+    @POST("/v1/device-token")
+    suspend fun registerDeviceToken(@Body request: DeviceTokenRequest)
+
 }

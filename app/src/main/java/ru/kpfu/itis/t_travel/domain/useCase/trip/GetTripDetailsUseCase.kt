@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetTripDetailsUseCase @Inject constructor(
     private val tripRepository: TripRepository
 ) {
-    suspend operator fun invoke(tripId: Int): Trip {
-        return tripRepository.getTripDetails(tripId)
+    suspend operator fun invoke(tripId: Int, forceRefresh:Boolean = true): Trip {
+        return tripRepository.getTripDetails(tripId, forceRefresh = forceRefresh)
     }
 }

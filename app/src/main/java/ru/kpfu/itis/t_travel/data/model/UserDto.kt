@@ -10,6 +10,7 @@ data class UserDto(
     @SerializedName("lastName") val lastName: String,
     @SerializedName("email") val email: String,
     @SerializedName("phone") val phone: String,
+    @SerializedName("password") val password: String = "",
 ) {
     fun toDomain(): User {
         return User(

@@ -7,7 +7,7 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 import ru.kpfu.itis.t_travel.data.remote.TokenRefreshService
-import ru.kpfu.itis.t_travel.presentation.common.TokenManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.TokenManager
 import ru.kpfu.itis.t_travel.presentation.navigation.AppNavigator
 import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 import ru.kpfu.itis.t_travel.utils.runCatchingNonCancellation

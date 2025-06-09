@@ -1,18 +1,19 @@
 package ru.kpfu.itis.t_travel.data.repository
 
+import android.util.Log
 import ru.kpfu.itis.t_travel.data.model.UserRegistrationRequest
 import ru.kpfu.itis.t_travel.data.remote.ApiService
 import ru.kpfu.itis.t_travel.domain.model.AuthResult
 import ru.kpfu.itis.t_travel.domain.model.LoginCredentials
 import ru.kpfu.itis.t_travel.domain.model.User
 import ru.kpfu.itis.t_travel.domain.repository.AuthRepository
-import ru.kpfu.itis.t_travel.presentation.common.TokenManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.TokenManager
 import ru.kpfu.itis.t_travel.utils.runSuspendCatching
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
 ) : AuthRepository {
     override suspend fun login(credentials: LoginCredentials): AuthResult {
         val response = apiService.login(credentials)
@@ -42,18 +43,15 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
-        try {
-            val refreshToken = tokenManager.getRefreshToken()
-            if (refreshToken != null) {
-                apiService.logout()
-            }
-        } finally {
-            tokenManager.clearTokens()
+        val refreshToken = tokenManager.getRefreshToken()
+        Log.i("refreshToken", refreshToken.toString())
+        if (refreshToken != null) {
+            apiService.logout(mapOf("refreshToken" to refreshToken))
         }
+
     }
 
     override suspend fun userId(): Int {
         return apiService.getUserId()
     }
-
 }

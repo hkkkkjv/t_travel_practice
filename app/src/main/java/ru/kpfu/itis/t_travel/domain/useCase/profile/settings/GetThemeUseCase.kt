@@ -1,6 +1,6 @@
 package ru.kpfu.itis.t_travel.domain.useCase.profile.settings
 
-import ru.kpfu.itis.t_travel.presentation.common.ThemeManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.ThemeManager
 import javax.inject.Inject
 
 class GetThemeUseCase @Inject constructor(

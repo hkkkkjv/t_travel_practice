@@ -15,8 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,10 +48,17 @@ import kotlinx.collections.immutable.toImmutableList
 import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.domain.model.Expense
 import ru.kpfu.itis.t_travel.domain.model.Participant
+import ru.kpfu.itis.t_travel.domain.model.SettlementItem
 import ru.kpfu.itis.t_travel.presentation.common.ui.CustomAvatar
+import ru.kpfu.itis.t_travel.presentation.common.ui.ExpensesBottomSheet
+import ru.kpfu.itis.t_travel.presentation.common.ui.MyDebtsBottomSheet
+import ru.kpfu.itis.t_travel.presentation.common.ui.OweMeBottomSheet
+import ru.kpfu.itis.t_travel.presentation.common.ui.ParticipantsBottomSheet
 import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBarWithBack
+import ru.kpfu.itis.t_travel.presentation.common.ui.getAvatarColor
 import ru.kpfu.itis.t_travel.presentation.screens.trips.budget.BudgetCategoryUi
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TripDetailsScreen(
     viewModel: TripDetailsViewModel = hiltViewModel(),
@@ -58,6 +68,10 @@ fun TripDetailsScreen(
     LaunchedEffect(tripId) {
         viewModel.onEvent(TripDetailsEvent.Load(tripId))
     }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isLoading,
+        onRefresh = { viewModel.onEvent(TripDetailsEvent.Refresh) }
+    )
     Scaffold(
         topBar = {
             TransparentTopAppBarWithBack(
@@ -97,7 +111,13 @@ fun TripDetailsScreen(
                     )
                 }
             } else {
-                TripDetailsContent(state, viewModel::onEvent, Modifier.padding(padding))
+                TripDetailsContent(
+                    state,
+                    viewModel::onEvent,
+                    Modifier
+                        .padding(padding)
+                        .pullRefresh(pullRefreshState)
+                )
             }
         }
     }
@@ -109,6 +129,41 @@ fun TripDetailsContent(
     onEvent: (TripDetailsEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    if (state.showParticipantsSheet) {
+        ParticipantsBottomSheet(
+            participants = state.participants,
+            onDismiss = { onEvent(TripDetailsEvent.DismissParticipantsSheet) },
+            onAddParticipant = {
+                state.trip?.id?.let { tripId ->
+                    onEvent(TripDetailsEvent.AddParticipantsClicked(tripId))
+                }
+            }
+        )
+    }
+    if (state.showExpensesSheet) {
+        ExpensesBottomSheet(
+            participants = state.participants,
+            onDismiss = { onEvent(TripDetailsEvent.DismissExpensesSheet) },
+            expenses = state.expenses,
+        )
+    }
+    if (state.showMyDebtsSheet) {
+        MyDebtsBottomSheet(
+            participants = state.participants,
+            onDismiss = { onEvent(TripDetailsEvent.DismissMyDebtsSheet) },
+            settlements = state.myDebts,
+            onRequest = { onEvent(TripDetailsEvent.RequestDebtConfirmation(it)) },
+        )
+    }
+    if (state.showOwedMeSheet) {
+        OweMeBottomSheet(
+            settlements = state.oweMe,
+            participants = state.participants,
+            onConfirm = { onEvent(TripDetailsEvent.ConfirmDebtReturn(it)) },
+            onDismiss = { onEvent(TripDetailsEvent.DismissOwedToMeSheet) }
+        )
+    }
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -195,13 +250,16 @@ fun TripDetailsContent(
                     Modifier
                         .fillMaxWidth()
                         .padding(bottom = 12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
                     shape = MaterialTheme.shapes.extraLarge,
                     elevation = CardDefaults.elevatedCardElevation(6.dp)
                 ) {
                     Column(Modifier.padding(24.dp)) {
                         Spacer(Modifier.height(8.dp))
-                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Box(
+                            Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             BudgetPieChart(
                                 total = state.totalBudget,
                                 categories = state.categories
@@ -229,18 +287,20 @@ fun TripDetailsContent(
         }
         item {
             DebtsCardStyled(
-                title = stringResource(R.string.i_am_owed),
-                debts = state.oweMe.take(2).toImmutableList(),
-                participants = state.participants,
-                onClick = { onEvent(TripDetailsEvent.OweMeClicked) }
-            )
-        }
-        item {
-            DebtsCardStyled(
+                isMyDebt = true,
                 title = stringResource(R.string.my_debts),
                 debts = state.myDebts.take(2).toImmutableList(),
                 participants = state.participants,
                 onClick = { onEvent(TripDetailsEvent.MyDebtsClicked) }
+            )
+        }
+        item {
+            DebtsCardStyled(
+                isMyDebt = false,
+                title = stringResource(R.string.owed_to_me),
+                debts = state.oweMe.take(2).toImmutableList(),
+                participants = state.participants,
+                onClick = { onEvent(TripDetailsEvent.OweMeClicked) }
             )
         }
     }
@@ -281,7 +341,7 @@ fun BudgetCategoriesLegend(categories: ImmutableList<BudgetCategoryUi>) {
                     stringResource(cat.type.nameRes),
                     Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
                     "${cat.amount.toInt().let { String.format("%,d ₽", it).replace(',', ' ') }}",
@@ -303,7 +363,7 @@ fun ParticipantsCardStyled(
         modifier = Modifier
             .fillMaxWidth(),
         onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.elevatedCardElevation(6.dp)
     ) {
@@ -324,7 +384,10 @@ fun ParticipantsCardStyled(
                         )
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(p.name, style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                p.name,
+                                style = MaterialTheme.typography.titleMedium,
+                            )
                             Text(
                                 p.contact,
                                 style = MaterialTheme.typography.bodySmall,
@@ -374,13 +437,6 @@ fun ParticipantsCardStyled(
     }
 }
 
-@Composable
-fun getAvatarColor(idx: Int): Color = when (idx) {
-    0 -> MaterialTheme.colorScheme.primary.copy(0.7f)
-    1 -> MaterialTheme.colorScheme.secondary.copy(0.7f)
-    2 -> MaterialTheme.colorScheme.secondaryContainer
-    else -> MaterialTheme.colorScheme.surface
-}
 
 @Composable
 fun ExpensesCardStyled(
@@ -392,31 +448,34 @@ fun ExpensesCardStyled(
         modifier = Modifier
             .fillMaxWidth(),
         onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.elevatedCardElevation(6.dp)
     ) {
         Column(Modifier.padding(20.dp)) {
             if (expenses.isEmpty()) {
-                Text(stringResource(R.string.no_expenses), style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                Text(
+                    stringResource(R.string.no_expenses),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
             } else {
                 expenses.forEachIndexed { idx, e ->
                     val paidByParticipant = participants.find { it.id == e.paidBy }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CustomAvatar(
-                            name = paidByParticipant?.name ?: "?",
-                            modifier = Modifier.size(32.dp),
+                            name = e.description,
                             backgroundColor = getAvatarColor(idx),
-
-                            )
+                            size = 48
+                        )
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
                             Text(
-                                paidByParticipant?.name ?: "?",
+                                e.description ?: "?",
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
-                                e.description ?: "-",
+                                paidByParticipant?.name ?: "?",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.Gray
                             )
@@ -436,8 +495,9 @@ fun ExpensesCardStyled(
 
 @Composable
 fun DebtsCardStyled(
+    isMyDebt: Boolean,
     title: String,
-    debts: ImmutableList<Expense>,
+    debts: ImmutableList<SettlementItem>,
     participants: ImmutableList<Participant>,
     onClick: () -> Unit
 ) {
@@ -445,7 +505,7 @@ fun DebtsCardStyled(
         modifier = Modifier
             .fillMaxWidth(),
         onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.elevatedCardElevation(6.dp)
     ) {
@@ -453,16 +513,20 @@ fun DebtsCardStyled(
             Text(title, style = MaterialTheme.typography.titleMedium, color = Color.Black)
             Spacer(Modifier.height(8.dp))
             if (debts.isEmpty()) {
-                Text(stringResource(R.string.no_debts), style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+                Text(
+                    stringResource(R.string.no_debts),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
             } else {
                 debts.forEachIndexed { idx, e ->
-                    val paidByParticipant = participants.find { it.id == e.paidBy }
+                    val paidByParticipant =
+                        participants.find { it.id == if (isMyDebt) e.to else e.from }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CustomAvatar(
                             name = paidByParticipant?.name ?: "?",
-                            modifier = Modifier.size(32.dp),
-                            backgroundColor = getAvatarColor(idx),
-                            size = 32
+                            backgroundColor = getAvatarColor(paidByParticipant?.id ?:idx),
+                            size = 48
                         )
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
@@ -470,11 +534,12 @@ fun DebtsCardStyled(
                                 paidByParticipant?.name ?: "?",
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            Text(
-                                e.description ?: "-",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
-                            )
+//Описание нам не отдают бэки:(
+//                            Text(
+//                                e.description ?: "-",
+//                                style = MaterialTheme.typography.bodySmall,
+//                                color = Color.Gray
+//                            )
                         }
                         Text(
                             e.amount.toInt().let { String.format("%,d ₽", it).replace(',', ' ') },

@@ -16,12 +16,12 @@ import kotlinx.coroutines.launch
 import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.domain.model.Expense
 import ru.kpfu.itis.t_travel.domain.useCase.auth.GetCurrentUserIdUseCase
-import ru.kpfu.itis.t_travel.domain.useCase.trip.AddExpenseUseCase
-import ru.kpfu.itis.t_travel.domain.useCase.trip.GetTripBudgetUseCase
-import ru.kpfu.itis.t_travel.domain.useCase.trip.GetTripParticipantsUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.budget.GetBudgetCategoriesUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.budget.GetTripBudgetUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.expense.AddExpenseUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.participant.GetTripParticipantsUseCase
 import ru.kpfu.itis.t_travel.presentation.common.BaseViewModel
 import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
-import ru.kpfu.itis.t_travel.presentation.screens.trips.budget.BudgetCategoryType
 import ru.kpfu.itis.t_travel.presentation.screens.trips.budget.BudgetCategoryUi
 import ru.kpfu.itis.t_travel.utils.runSuspendCatching
 import javax.inject.Inject
@@ -30,6 +30,7 @@ import javax.inject.Inject
 class AddExpenseViewModel @Inject constructor(
     private val addExpenseUseCase: AddExpenseUseCase,
     private val getTripBudgetUseCase: GetTripBudgetUseCase,
+    private val getBudgetCategoriesUseCase: GetBudgetCategoriesUseCase,
     private val getTripParticipantsUseCase: GetTripParticipantsUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     @ApplicationContext private val context: Context
@@ -91,6 +92,12 @@ class AddExpenseViewModel @Inject constructor(
                 _state.update { it.copy(error = error.message, isLoading = false) }
                 return@launch
             }
+            val allCategories = runSuspendCatching {
+                getBudgetCategoriesUseCase()
+            }.getOrElse { error ->
+                _state.update { it.copy(error = error.message, isLoading = false) }
+                return@launch
+            }.toImmutableList()
             val participants = runSuspendCatching {
                 getTripParticipantsUseCase(tripId, false)
             }.getOrElse { error ->
@@ -104,11 +111,14 @@ class AddExpenseViewModel @Inject constructor(
                 return@launch
             }//пока не исправили контракт на использование жвт токена используем данный useCase
             Log.i("AddExpenseViewModel", categories.toString())
-            val categoriesUi = categories.mapNotNull { cat ->
-                BudgetCategoryType.fromServerName(cat.category)?.let { type ->
-                    BudgetCategoryUi(type, cat.allocatedAmount)
+            val categoriesUi = allCategories
+                .filter { categoryLookup ->
+                    categories.any { budgetCategory ->
+                        budgetCategory.category == categoryLookup.name
+                    }
                 }
-            }.toImmutableList()
+                .mapNotNull{ BudgetCategoryUi.fromLookup(it) }
+                .toImmutableList()
             Log.i("AddExpenseViewModel", categoriesUi.toString())
             _state.update {
                 it.copy(
@@ -134,7 +144,7 @@ class AddExpenseViewModel @Inject constructor(
                         tripId = currentState.tripId,
                         description = currentState.title,
                         amount = currentState.amount.toDoubleOrNull() ?: 0.0,
-                        //category = currentState.selectedCategory?.id ?: 0,
+                        category = currentState.selectedCategory?.id ?: 0,
                         beneficiaries = currentState.selectedParticipants.map { it.id },
                         paidBy = state.value.userId
                     ),
@@ -155,6 +165,10 @@ class AddExpenseViewModel @Inject constructor(
         }
         if (state.amount.isBlank() || state.amount.toDoubleOrNull() == null) {
             _state.update { it.copy(error = context.getString(R.string.error_enter_valid_amount)) }
+            return false
+        }
+        if (state.selectedCategory == null) {
+            _state.update { it.copy(error = context.getString(R.string.error_select_category)) }
             return false
         }
         if (state.selectedParticipants.isEmpty()) {

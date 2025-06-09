@@ -1,4 +1,4 @@
-package ru.kpfu.itis.t_travel.domain.useCase.trip.create
+package ru.kpfu.itis.t_travel.domain.useCase.trip.participant
 
 import ru.kpfu.itis.t_travel.domain.model.Participant
 import ru.kpfu.itis.t_travel.domain.repository.TripRepository

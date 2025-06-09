@@ -1,6 +1,6 @@
 package ru.kpfu.itis.t_travel.domain.useCase.profile.settings
 
-import ru.kpfu.itis.t_travel.presentation.common.LanguageManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.LanguageManager
 import javax.inject.Inject
 
 class SetLanguageUseCase @Inject constructor(

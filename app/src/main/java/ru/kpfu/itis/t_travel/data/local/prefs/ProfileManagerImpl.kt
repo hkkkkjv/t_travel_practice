@@ -5,7 +5,7 @@ import androidx.core.content.edit
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import ru.kpfu.itis.t_travel.presentation.common.AvatarManager
-import ru.kpfu.itis.t_travel.presentation.common.ProfileManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.ProfileManager
 import javax.inject.Inject
 
 class ProfileManagerImpl @Inject constructor(

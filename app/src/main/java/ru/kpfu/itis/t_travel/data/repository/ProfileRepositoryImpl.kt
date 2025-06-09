@@ -20,7 +20,8 @@ class ProfileRepositoryImpl @Inject constructor(
             firstName = user.firstName,
             lastName = user.lastName,
             email = user.email,
-            phone = user.phone
+            phone = user.phone,
+            password = user.password
         )
         apiService.updateUserProfile(userDto)
     }

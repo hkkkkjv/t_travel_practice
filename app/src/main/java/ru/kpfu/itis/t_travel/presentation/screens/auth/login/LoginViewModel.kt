@@ -75,7 +75,7 @@ class LoginViewModel @Inject constructor(
                     _loginState.update { it.copy(isLoading = false, error = error.message) }
                 }
             } catch (e: Exception) {
-                _loginState.update { it.copy(error = e.message ?: "Ошибка входа") }
+                _loginState.update { it.copy(error = e.message ?: context.getString(R.string.login_error)) }
             } finally {
                 _loginState.update { it.copy(isLoading = false) }
             }
@@ -84,8 +84,8 @@ class LoginViewModel @Inject constructor(
 
     private fun validateLoginInput(state: LoginState): String? {
         return when {
-            state.username.isBlank() -> context.getString(R.string.phone_blank_error)
-            !state.username.matches(Constants.Validation.USERNAME_REGEX) -> context.getString(R.string.phone_blank_error)
+            state.username.isBlank() -> context.getString(R.string.username_cannot_be_empty)
+            !state.username.matches(Constants.Validation.USERNAME_REGEX) -> context.getString(R.string.invalid_username)
             state.password.isBlank() -> context.getString(R.string.password_blank_error)
             else -> null
         }

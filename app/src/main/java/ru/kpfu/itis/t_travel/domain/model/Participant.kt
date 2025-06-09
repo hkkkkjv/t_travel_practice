@@ -1,7 +1,5 @@
 package ru.kpfu.itis.t_travel.domain.model
 
-import ru.kpfu.itis.t_travel.data.model.ParticipantDto
-
 data class Participant(
     val id: Int,
     val tripId: Int,
@@ -9,13 +7,6 @@ data class Participant(
     val contact: String,
     val confirmed: Boolean
 ) {
-    fun toDto(): ParticipantDto {
-        return ParticipantDto(
-            tripId = tripId,
-            name = name,
-            contact = contact,
-        )
-    }
 
     companion object {
         fun mock(id: Int = 1) = Participant(

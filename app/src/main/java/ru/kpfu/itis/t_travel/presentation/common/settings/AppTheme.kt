@@ -1,4 +1,4 @@
-package ru.kpfu.itis.t_travel.presentation.common
+package ru.kpfu.itis.t_travel.presentation.common.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource

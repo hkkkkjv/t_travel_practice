@@ -11,7 +11,8 @@ fun ExpenseDto.toEntity(): ExpenseEntity {
         tripId = tripId,
         description = description,
         amount = amount,
-        paidBy = paidBy
+        paidBy = paidBy,
+        category = category
     )
 }
 
@@ -22,6 +23,7 @@ fun ExpenseEntity.toDomain(beneficiaries:List<Int>): Expense {
         description = description,
         amount = amount,
         paidBy = paidBy,
+        category = category,
         beneficiaries = beneficiaries
     )
 }
@@ -32,7 +34,8 @@ fun Expense.toEntity(): ExpenseEntity {
         tripId = tripId,
         description = description,
         amount = amount,
-        paidBy = paidBy
+        paidBy = paidBy,
+        category = category
     )
 }
 
@@ -43,6 +46,7 @@ fun Expense.toDto(): ExpenseDto {
         description = description,
         amount = amount,
         paidBy = paidBy,
+        category = category,
         beneficiaries = beneficiaries
     )
 }

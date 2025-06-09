@@ -9,8 +9,8 @@ import ru.kpfu.itis.t_travel.data.local.database.entity.SettlementEntity
 
 @Dao
 interface SettlementDao {
-    @Query("SELECT * FROM settlements WHERE tripId = :tripId")
-    fun getSettlementsForTrip(tripId: Int): List<SettlementEntity>
+    @Query("SELECT * FROM settlements WHERE trip_id = :tripId")
+    suspend fun getSettlementsForTrip(tripId: Int): List<SettlementEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSettlements(settlements: List<SettlementEntity>)
@@ -18,9 +18,9 @@ interface SettlementDao {
     @Delete
     suspend fun deleteSettlements(settlements: List<SettlementEntity>)
 
-    @Query("DELETE FROM settlements WHERE tripId = :tripId")
+    @Query("DELETE FROM settlements WHERE trip_id = :tripId")
     suspend fun deleteSettlementsForTrip(tripId: Int)
 
-    @Query("SELECT * FROM settlements WHERE tripId = :tripId AND lastUpdated < :timestamp")
+    @Query("SELECT * FROM settlements WHERE trip_id = :tripId AND last_updated < :timestamp")
     suspend fun getStaleSettlements(tripId: Int, timestamp: Long): List<SettlementEntity>
 } 

@@ -1,7 +1,9 @@
 package ru.kpfu.itis.t_travel.presentation.screens.trips.create
 
+import androidx.compose.runtime.Immutable
 import java.time.LocalDate
 
+@Immutable
 data class NewTripState(
     val title: String = "",
     val description: String = "",
@@ -13,4 +15,4 @@ data class NewTripState(
     val error: String? = null,
     val showDatePickerStart: Boolean = false,
     val showDatePickerEnd: Boolean = false,
-    )
+)

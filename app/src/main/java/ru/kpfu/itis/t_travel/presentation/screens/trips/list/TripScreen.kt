@@ -22,6 +22,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -58,6 +59,7 @@ import ru.kpfu.itis.t_travel.domain.model.Trip
 import ru.kpfu.itis.t_travel.presentation.common.ui.CustomAvatar
 import ru.kpfu.itis.t_travel.presentation.common.ui.PrimaryAlertDialog
 import ru.kpfu.itis.t_travel.presentation.common.ui.TransparentTopAppBar
+import ru.kpfu.itis.t_travel.presentation.common.ui.getAvatarColor
 import java.time.LocalDate
 
 @Composable
@@ -90,14 +92,9 @@ fun TripItem(
     trip: Trip,
     participants: ImmutableList<Participant>,
     expenses: ImmutableList<Expense>,
-    currentUserId: Int,
+    isInvitation: Boolean,
     onAction: (TripAction) -> Unit
 ) {
-    val currentUserParticipant = participants.find { it.id == currentUserId }
-    Log.i("TEST TAG", "currentUserParticipant $currentUserParticipant")
-    val isInvitation = currentUserParticipant != null && !currentUserParticipant.confirmed
-    Log.i("TEST TAG", "isInvitation $isInvitation")
-
     var showFavoriteDialog by remember { mutableStateOf(false) }
     if (showFavoriteDialog) {
         PrimaryAlertDialog(
@@ -114,7 +111,6 @@ fun TripItem(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                //Потом поменять на !isInvitation оба
                 onClick = {
                     if (!isInvitation) {
                         onAction(TripAction.SelectTrip(trip.id))
@@ -126,12 +122,12 @@ fun TripItem(
                     }
                 }
             )
-            .padding(16.dp),
+            .padding(vertical = 8.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            CustomAvatar(name = trip.title)
+            CustomAvatar(name = trip.title, backgroundColor = getAvatarColor(trip.id))
             Spacer(Modifier.width(16.dp))
             Column {
                 Text(
@@ -155,11 +151,13 @@ fun TripItem(
                         color = Color.Gray
                     )
                 } else {
+                    Log.i("expenses TAG", expenses.toString())
                     val lastExpenseText = if (expenses.isNotEmpty()) {
                         val lastExpense = expenses.last()
                         shortenText(
                             (participants.find { it.id == lastExpense.paidBy }?.name
-                                ?: stringResource(R.string.participant)) + ":" + lastExpense.amount + "руб")
+                                ?: stringResource(R.string.participant)) + ":" + lastExpense.amount + "руб"
+                        )
                     } else {
                         stringResource(R.string.no_expenses)
                     }
@@ -207,7 +205,7 @@ fun TripItem(
     }
 }
 
-fun shortenText(text: String, maxLength: Int = 35): String {
+fun shortenText(text: String, maxLength: Int = 25): String {
     return if (text.length > maxLength) {
         text.take(maxLength - 1) + "…"
     } else {
@@ -245,6 +243,7 @@ private fun InternalTripScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
+                    .pullRefresh(pullRefreshState)
             ) {
                 when {
                     state.isLoading -> {
@@ -272,7 +271,7 @@ private fun InternalTripScreen(
                         }
                     }
 
-                    state.trips.isEmpty() -> {
+                    state.confirmedTrips.isEmpty() && state.pendingTrips.isEmpty() -> {
                         Text(
                             text = stringResource(R.string.no_trips_available),
                             modifier = Modifier.align(Alignment.Center),
@@ -281,19 +280,10 @@ private fun InternalTripScreen(
                     }
 
                     else -> {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            items(items = state.trips, key = { it.id }) { trip ->
-                                TripItem(
-                                    trip = trip,
-                                    participants = state.participantsByTripId[trip.id]
-                                        ?: persistentListOf(),
-                                    expenses = state.expensesByTripId[trip.id]
-                                        ?: persistentListOf(),
-                                    currentUserId = state.currentUserId,
-                                    onAction = onAction
-                                )
-                            }
-                        }
+                        TripsLists(
+                            state = state,
+                            onAction = onAction
+                        )
                     }
                 }
                 PullRefreshIndicator(
@@ -308,13 +298,64 @@ private fun InternalTripScreen(
     )
 }
 
+@Composable
+fun TripsLists(
+    state: TripState,
+    onAction: (TripAction) -> Unit
+
+    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            if (state.pendingTrips.isNotEmpty()) {
+                items(state.pendingTrips) { trip ->
+                    TripItem(
+                        trip = trip,
+                        participants = state.participantsByTripId[trip.id] ?: persistentListOf(),
+                        expenses = state.expensesByTripId[trip.id] ?: persistentListOf(),
+                        onAction = onAction,
+                        isInvitation = true
+                    )
+                }
+            }
+            Log.i("confirmedTrips", state.confirmedTrips.toString())
+
+            if (state.confirmedTrips.isNotEmpty()) {
+                items(state.confirmedTrips) { trip ->
+                    TripItem(
+                        trip = trip,
+                        onAction = onAction,
+                        participants = state.participantsByTripId[trip.id] ?: persistentListOf(),
+                        expenses = state.expensesByTripId[trip.id] ?: persistentListOf(),
+                        isInvitation = false
+                    )
+                }
+            }
+            if (state.pendingTrips.isEmpty() && state.confirmedTrips.isEmpty() && !state.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_trips_available),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun PreviewTripScreen() {
     MaterialTheme {
         InternalTripScreen(
             state = TripState(
-                trips = persistentListOf(
+                confirmedTrips = persistentListOf(
                     Trip(
                         id = 1,
                         title = "Улетаю на Гаити",

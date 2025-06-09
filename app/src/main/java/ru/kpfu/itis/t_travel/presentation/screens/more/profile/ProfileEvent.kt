@@ -1,8 +1,8 @@
 package ru.kpfu.itis.t_travel.presentation.screens.more.profile
 
 import android.net.Uri
-import ru.kpfu.itis.t_travel.presentation.common.AppLanguage
-import ru.kpfu.itis.t_travel.presentation.common.AppTheme
+import ru.kpfu.itis.t_travel.presentation.common.settings.AppLanguage
+import ru.kpfu.itis.t_travel.presentation.common.settings.AppTheme
 
 sealed class ProfileEvent {
     object EditProfileClicked : ProfileEvent()
@@ -16,4 +16,9 @@ sealed class ProfileEvent {
     data class LanguageSelected(val language: AppLanguage) : ProfileEvent()
     object ThemeDialogDismissed : ProfileEvent()
     object LanguageDialogDismissed : ProfileEvent()
+    data class FirstNameChanged(val value: String) : ProfileEvent()
+    data class LastNameChanged(val value: String) : ProfileEvent()
+    data class PhoneChanged(val value: String) : ProfileEvent()
+    data class EmailChanged(val value: String) : ProfileEvent()
+    object SaveProfileClicked : ProfileEvent()
 }

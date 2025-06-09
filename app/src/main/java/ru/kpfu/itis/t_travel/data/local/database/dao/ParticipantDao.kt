@@ -10,8 +10,8 @@ import ru.kpfu.itis.t_travel.data.local.database.entity.ParticipantEntity
 
 @Dao
 interface ParticipantDao {
-    @Query("SELECT * FROM participants WHERE tripId = :tripId")
-    fun getParticipantsForTrip(tripId: Int): List<ParticipantEntity>
+    @Query("SELECT * FROM participants WHERE trip_id = :tripId")
+    suspend fun getParticipantsForTrip(tripId: Int): List<ParticipantEntity>
 
     @Query("SELECT * FROM participants WHERE id = :participantId")
     suspend fun getParticipantById(participantId: Int): ParticipantEntity?
@@ -28,12 +28,12 @@ interface ParticipantDao {
     @Delete
     suspend fun deleteParticipant(participant: ParticipantEntity)
 
-    @Query("DELETE FROM participants WHERE tripId = :tripId")
+    @Query("DELETE FROM participants WHERE trip_id = :tripId")
     suspend fun deleteParticipantsForTrip(tripId: Int)
 
     @Query("UPDATE participants SET confirmed = :confirmed WHERE id = :participantId")
     suspend fun updateConfirmationStatus(participantId: Int, confirmed: Boolean)
 
-    @Query("SELECT * FROM participants WHERE tripId = :tripId AND lastUpdated < :timestamp")
+    @Query("SELECT * FROM participants WHERE trip_id = :tripId AND last_updated < :timestamp")
     suspend fun getStaleParticipants(tripId: Int, timestamp: Long): List<ParticipantEntity>
 } 

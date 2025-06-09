@@ -9,11 +9,11 @@ import ru.kpfu.itis.t_travel.data.local.prefs.LanguageManagerImpl
 import ru.kpfu.itis.t_travel.data.local.prefs.ProfileManagerImpl
 import ru.kpfu.itis.t_travel.data.local.prefs.ThemeManagerImpl
 import ru.kpfu.itis.t_travel.data.local.prefs.TokenManagerImpl
-import ru.kpfu.itis.t_travel.presentation.common.FavoriteTripManager
-import ru.kpfu.itis.t_travel.presentation.common.LanguageManager
-import ru.kpfu.itis.t_travel.presentation.common.ProfileManager
-import ru.kpfu.itis.t_travel.presentation.common.ThemeManager
-import ru.kpfu.itis.t_travel.presentation.common.TokenManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.FavoriteTripManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.LanguageManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.ProfileManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.ThemeManager
+import ru.kpfu.itis.t_travel.presentation.common.settings.TokenManager
 import javax.inject.Singleton
 
 @Module

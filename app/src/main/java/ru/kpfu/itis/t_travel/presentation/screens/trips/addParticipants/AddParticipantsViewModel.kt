@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.t_travel.R
 import ru.kpfu.itis.t_travel.domain.model.Participant
-import ru.kpfu.itis.t_travel.domain.useCase.trip.GetTripParticipantsUseCase
-import ru.kpfu.itis.t_travel.domain.useCase.trip.create.AddParticipantsUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.participant.AddParticipantsUseCase
+import ru.kpfu.itis.t_travel.domain.useCase.trip.participant.GetTripParticipantsUseCase
 import ru.kpfu.itis.t_travel.presentation.common.BaseViewModel
 import ru.kpfu.itis.t_travel.presentation.navigation.NavigationAction
 import ru.kpfu.itis.t_travel.utils.runSuspendCatching
@@ -68,6 +68,7 @@ class AddParticipantsViewModel @Inject constructor(
             }
 
             AddParticipantsEvent.NextClicked -> navigate(NavigationAction.NavigateToAddBudget(tripId = tripId.toString()))
+            AddParticipantsEvent.BackClicked -> navigate(NavigationAction.NavigateBack)
         }
     }
 
